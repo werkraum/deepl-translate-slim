@@ -1,0 +1,14 @@
+{
+    "name": "lukas/libs",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Lukas Niestroj",
+            "email": "lukas.niestroj@werkraum.net"
+        }
+    ],
+    "require": {
+        "carica/phpcss": "^2.0",
+        "jaybizzle/crawler-detect": "^1.2"
+    }
+}

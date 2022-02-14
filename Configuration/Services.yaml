@@ -1,0 +1,58 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  Werkraum\DeeplTranslate\:
+    resource: '../Classes/*'
+
+  deepl.deepl_translate_cache:
+    class: TYPO3\CMS\Core\Cache\Frontend\FrontendInterface
+    factory: ['@Werkraum\DeeplTranslate\Cache\DeeplCacheManager', 'getCache']
+    arguments: ['deepl_translate_cache']
+
+  Werkraum\DeeplTranslate\Cache\DeeplCacheManager:
+    public: true
+
+  Werkraum\DeeplTranslate\Controller\Backend\AjaxController:
+    public: true
+
+  Werkraum\DeeplTranslate\Controller\CacheOverviewController:
+    tags: [ 'backend.controller' ]
+
+  Werkraum\DeeplTranslate\HrefLang\HrefLangGenerator:
+    tags:
+      - name: 'event.listener'
+        identifier: 'werkraum/deepl-translate/hreflangGenerator'
+        event: TYPO3\CMS\Frontend\Event\ModifyHrefLangTagsEvent
+
+  Werkraum\DeeplTranslate\Middleware\EventListener\IsAllowedLanguageEventListener:
+    tags:
+      - name: 'event.listener'
+        before: 'werkraum/deepl-translate/isBot'
+        identifier: 'werkraum/deepl-translate/isAllowedLanguage'
+        event: Werkraum\DeeplTranslate\Middleware\Event\IsTranslationAllowedEvent
+
+  Werkraum\DeeplTranslate\Middleware\EventListener\IsBotEventListener:
+    tags:
+      - name: 'event.listener'
+        identifier: 'werkraum/deepl-translate/isBot'
+        event: Werkraum\DeeplTranslate\Middleware\Event\IsTranslationAllowedEvent
+
+  Werkraum\DeeplTranslate\Cache\DatabaseSchemaService:
+    tags:
+      - name: 'event.listener'
+        identifier: 'werkraum/deepl-translate/databaseSchemaService'
+        method: 'addCachingFrameworkDatabaseSchema'
+        event: TYPO3\CMS\Core\Database\Event\AlterTableDefinitionStatementsEvent
+
+  Werkraum\DeeplTranslate\Backend\ModifyButtonBarEventListener:
+    tags:
+      - name: 'event.listener'
+        event: TYPO3\CMS\Backend\Template\Components\ModifyButtonBarEvent
+
+  Werkraum\DeeplTranslate\Backend\ModifyClearCacheActionsEventListener:
+    tags:
+      - name: 'event.listener'
+        event: TYPO3\CMS\Backend\Backend\Event\ModifyClearCacheActionsEvent

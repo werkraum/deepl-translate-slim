@@ -1,0 +1,10 @@
+deepl {
+  # cat=deepl; type=boolean; label= Enable debug mode. Display Menu.
+  debug=0
+  # cat=deepl; type=string; label= Path of Fluid Templates
+  templateRootPath =
+  # cat=deepl; type=string; label= Path of Fluid Partials
+  partialRootPath =
+  # cat=deepl; type=string; label= Path of Fluid Layouts
+  layoutRootPath =
+}

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+	<file source-language="en" datatype="plaintext" original="EXT:frontend/Resources/Private/Language/locallang_tca.xlf" date="2011-10-17T20:22:32Z" product-name="cms">
+		<header/>
+		<body>
+			<trans-unit id="mod_tx_deepl_translate_deepl_translate_cache_overview" resname="mod_tx_deepl_translate_deepl_translate_cache_overview">
+				<source>Deepl Cache Overview</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

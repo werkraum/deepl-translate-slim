@@ -1,0 +1,22 @@
+# cat=DeepL; type=string; label=authentication key
+authenticationKey=
+# cat=DeepL; type=options[Pro=api.deepl.com,Free=api-free.deepl.com]; label=API Type
+host=api-free.deepl.com
+
+# cat=Advanced; type=string; label=ignore_tags (comma-separated!)
+ignoreTags=script,style,img,audio,video
+# cat=DeepL; type=options[Default=default,More=more,Less=less]; label=formality
+formality=default
+# cat=Advanced; type=options[No=0,Yes=1,No new lines=nonewlines]; label=split_sentences
+splitSentences=nonewlines
+# cat=Advanced; type=options[No=0,Yes=1]; label=preserve_formatting
+preserveFormatting=0
+# cat=Advanced; type=string; label=non_splitting_tags (comma-separated!)
+nonSplittingTags=
+# cat=Advanced; type=options[No=0,Yes=1]; label=outline_detection
+outlineDetection=1
+# cat=Advanced; type=string; label=splitting_tags (comma-separated!)
+splittingTags=
+
+# cat=Advanced; type=options[No=0,Yes=1]; label=Clear Deepl Cache on any Page/Content change
+clearCache=0

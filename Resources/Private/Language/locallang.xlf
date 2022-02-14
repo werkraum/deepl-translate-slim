@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+	<file source-language="en" datatype="plaintext" product-name="deepl_translate">
+		<header/>
+		<body>
+			<trans-unit id="clearAllCacheTitle">
+				<source>Flush DeepL caches</source>
+			</trans-unit>
+			<trans-unit id="clearAllCacheDescription">
+				<source>Clear all cached translations fetched by DeepL</source>
+			</trans-unit>
+			<trans-unit id="clearPageCacheTitle">
+				<source>Clear all cached translations fetched by DeepL on this page</source>
+			</trans-unit>
+			<trans-unit id="clearedPageCache.title">
+				<source>DeepL cache</source>
+			</trans-unit>
+			<trans-unit id="clearedPageCache.message.success">
+				<source>Successfully cleared DeepL cache</source>
+			</trans-unit>
+			<trans-unit id="clearedPageCache.message.error">
+				<source>Something went wrong clearing the DeepL cache</source>
+			</trans-unit>
+			<trans-unit id="site.default_deepl_source_language.label">
+				<source>(default/fallback) Source Language</source>
+			</trans-unit>
+			<trans-unit id="site.default_deepl_source_language.description">
+				<source>The source language DeepL will use to translate from. Can be disabled for each language. See languages.</source>
+			</trans-unit>
+			<trans-unit id="site.default_deepl_allowed_languages.label">
+				<source>(default/fallback) Allowed targets</source>
+			</trans-unit>
+			<trans-unit id="site.default_deepl_allowed_languages.description">
+				<source>Only this languages will be offered for translation. Can be changed for each language. See languages.</source>
+			</trans-unit>
+			<trans-unit id="site.deepl_hreflang.label">
+				<source>Hreflang</source>
+			</trans-unit>
+			<trans-unit id="site.deepl_hreflang.description">
+				<source>Add all allowed languages as alternate links. (clear the page cache to make this change take effect!)</source>
+			</trans-unit>
+			<trans-unit id="site.deepl_exclude_elements_by_selector.label">
+				<source>Exclude Elements</source>
+			</trans-unit>
+			<trans-unit id="site.deepl_exclude_elements_by_selector.description">
+				<source>Exclude HTML elements from translation by CSS3 Selector (comma-separated!)</source>
+			</trans-unit>
+			<trans-unit id="site.deepl_split_content_by_selectors.label">
+				<source>Split content</source>
+			</trans-unit>
+			<trans-unit id="site.deepl_split_content_by_selectors.description">
+				<source>DeepL has a content-length limit per translation request so we need to split our html into parts. Specify parts of your HTML by a comma-separated list of CSS3 selectors which can be translated separately. e.g. "#page-header,#page-content,#page-footer"</source>
+			</trans-unit>
+			<trans-unit id="site.deepl_replace_links.label">
+				<source>Replace links</source>
+			</trans-unit>
+			<trans-unit id="site.deepl_replace_links.description">
+				<source>Add the language param "deepl" to all links?</source>
+			</trans-unit>
+			<trans-unit id="site.deepl_replace_links_attribute.label">
+				<source>Skip links with these attributes (comma-separated!)</source>
+			</trans-unit>
+			<trans-unit id="site.deepl_replace_links_attribute.description">
+				<source> </source>
+			</trans-unit>
+			<trans-unit id="site.deepl_translated_by_machine.label">
+				<source>Translated by machine placeholder</source>
+			</trans-unit>
+			<trans-unit id="site.deepl_translated_by_machine.description">
+				<source>You have the following placeholder: {source}, {target}, {originalLink}</source>
+			</trans-unit>
+			<trans-unit id="site.deepl_translated_by_machine_target.label">
+				<source>Target for the Translated by machine placeholder</source>
+			</trans-unit>
+			<trans-unit id="site.deepl_translated_by_machine_target.description">
+				<source>Please specify an html element with an ID</source>
+			</trans-unit>
+			<trans-unit id="site.deepl_translate_translated_by_machine.label">
+				<source>Translate the Translated by machine placeholder</source>
+			</trans-unit>
+			<trans-unit id="site.deepl_translate_translated_by_machine.description">
+				<source> </source>
+			</trans-unit>
+			<trans-unit id="site.deepl_recaptcha.label">
+				<source>Recaptcha Protection</source>
+			</trans-unit>
+			<trans-unit id="site.deepl_recaptcha.description">
+				<source>Use recaptcha verification to allow access to translated content.</source>
+			</trans-unit>
+			<trans-unit id="site.deepl_recaptcha_redirect_to_page.label">
+				<source>Recaptcha Verify Page</source>
+			</trans-unit>
+			<trans-unit id="site.deepl_recaptcha_redirect_to_page.description">
+				<source>Use this site to redirect the user to verify their access vie recaptcha.</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

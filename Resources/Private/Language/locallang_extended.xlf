@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+	<file source-language="en" datatype="plaintext" product-name="deepl_translate">
+		<header/>
+		<body>
+			<trans-unit id="extended_title">
+				<source>Experience the full power with the Extended version of our TYPO3 DeepL integration</source>
+			</trans-unit>
+			<trans-unit id="extended_link_text">
+				<source>Discover all the features now</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

@@ -1,0 +1,47 @@
+{
+    "name": "werkraum/deepl-translate-slim",
+    "description": "Translate TYPO3 pages with DeepL without headaches",
+    "type": "typo3-cms-extension",
+	"homepage": "https://werkraum.net/typo3-deepl-integration",
+	"keywords": [
+		"translation",
+		"DeepL",
+		"ai",
+		"automation"
+	],
+	"license": ["GPL-2.0-or-later"],
+    "extra": {
+        "typo3/cms": {
+			"Package": {
+				"serviceProvider": "\\Werkraum\\DeeplTranslate\\ServiceProvider",
+				"protected": true
+			},
+            "extension-key": "deepl_translate"
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Werkraum\\DeeplTranslate\\": "Classes/"
+        }
+    },
+	"authors": [
+		{
+			"email": "info@werkraum.net",
+			"name": "werkraum Digitalmanufaktur GmbH",
+			"homepage": "https://werkraum.net",
+			"role": "Company"
+		},
+		{
+			"email": "lukas.niestroj@werkraum.net",
+			"name": "Lukas Niestroj",
+			"homepage": "https://werkraum.net",
+			"role": "Developer"
+		}
+	],
+	"require": {
+		"typo3/cms-core": "^12.4",
+		"php": "^8.1",
+		"ext-curl": "*",
+		"ext-dom": "*"
+	}
+}

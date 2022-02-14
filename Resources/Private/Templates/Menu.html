@@ -1,0 +1,14 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/Fluid/ViewHelpers"
+>
+<nav class="nav languagenav text-uppercase notranslate"
+     data-main-nav="language"
+>
+    <f:for each="{menu}" as="item" iteration="iter">
+        <a class="nav-link" href="{item.link}" hreflang="{item.hreflang}" title="{item.title}">
+            <span>{item.title}</span>
+        </a>
+    </f:for>
+</nav>
+<div id="translated_by_machine"></div>
+</html>
