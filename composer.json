@@ -2,6 +2,7 @@
     "name": "werkraum/deepl-translate-slim",
     "description": "Translate TYPO3 pages with DeepL without headaches",
     "type": "typo3-cms-extension",
+	"version": "1.0.0",
 	"homepage": "https://werkraum.net/typo3-deepl-integration",
 	"keywords": [
 		"translation",
