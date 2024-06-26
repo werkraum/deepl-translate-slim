@@ -3,15 +3,15 @@ lib.deepLMenu {
   templateName = Menu
 
   templateRootPaths {
-    0 = EXT:deepl_translate/Resources/Private/Templates/
+    0 = EXT:wr_deepl_translate/Resources/Private/Templates/
     10 = {$deepl.templateRootPath}
   }
   partialRootPaths {
-    0 = EXT:deepl_translate/Resources/Private/Partials/
+    0 = EXT:wr_deepl_translate/Resources/Private/Partials/
     10 = {$deepl.partialRootPath}
   }
   layoutRootPaths {
-    0 = EXT:deepl_translate/Resources/Private/Layouts/
+    0 = EXT:wr_deepl_translate/Resources/Private/Layouts/
     10 = {$deepl.layoutRootPath}
   }
 
@@ -23,5 +23,5 @@ lib.deepLMenu {
   }
 }
 
-page.includeJSFooter.deepl = EXT:deepl_translate/Resources/Public/static/deepl.js
+page.includeJSFooter.deepl = EXT:wr_deepl_translate/Resources/Public/static/deepl.js
 page.includeJSFooter.deepl.excludeFromConcatenation = 1

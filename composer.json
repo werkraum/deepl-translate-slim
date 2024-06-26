@@ -16,7 +16,7 @@
 				"serviceProvider": "\\Werkraum\\DeeplTranslate\\ServiceProvider",
 				"protected": true
 			},
-            "extension-key": "deepl_translate"
+            "extension-key": "wr_deepl_translate"
         }
     },
     "autoload": {

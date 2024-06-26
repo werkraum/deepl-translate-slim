@@ -17,6 +17,15 @@
  *
  */
 
+/*
+ * This file is part of TYPO3 CMS-based extension "deepl_translate" by werkraum.
+ *
+ *  It is free software; you can redistribute it and/or modify it under
+ *  the terms of the GNU General Public License, either version 2
+ *  of the License, or any later version.
+ *
+ */
+
 namespace Werkraum\DeeplTranslate\Backend;
 
 use TYPO3\CMS\Backend\Routing\UriBuilder;
@@ -42,8 +51,8 @@ class ModifyClearCacheActionsEventListener
         if ($isAdmin || $userTsConfig['options.']['clearCache.']['deepl'] ?? false) {
             $cacheAction = [
                 'id' => 'clearDeeplTranslationCache',
-                'title' => 'LLL:EXT:deepl_translate/Resources/Private/Language/locallang.xlf:clearAllCacheTitle',
-                'description' => 'LLL:EXT:deepl_translate/Resources/Private/Language/locallang.xlf:clearAllCacheDescription',
+                'title' => 'LLL:EXT:wr_deepl_translate/Resources/Private/Language/locallang.xlf:clearAllCacheTitle',
+                'description' => 'LLL:EXT:wr_deepl_translate/Resources/Private/Language/locallang.xlf:clearAllCacheDescription',
                 'href' => (string)$this->uriBuilder->buildUriFromRoute('deepl_clear_all_cache'),
                 'iconIdentifier' => 'actions-deepl-cache-clear-red'
             ];

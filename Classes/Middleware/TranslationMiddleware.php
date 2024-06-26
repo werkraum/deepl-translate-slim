@@ -9,6 +9,15 @@
  */
 
 /*
+ * This file is part of TYPO3 CMS-based extension "wr_deepl_translate" by werkraum.
+ *
+ *  It is free software; you can redistribute it and/or modify it under
+ *  the terms of the GNU General Public License, either version 2
+ *  of the License, or any later version.
+ *
+ */
+
+/*
  * This file is part of TYPO3 CMS-based extension "deepl_translate" by werkraum.
  *
  *  It is free software; you can redistribute it and/or modify it under
@@ -51,16 +60,11 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
 
     private ?DeepL $deepL = null;
 
-    private DeeplCacheManager $cacheManager;
-
-    private FrontendInterface $cache;
-
     public function __construct(
         protected EventDispatcherInterface $eventDispatcher,
-        protected DocumentProcessorChain $processorChain
+        protected DocumentProcessorChain $processorChain,
+        protected FrontendInterface $cache,
     ) {
-        $this->cacheManager = GeneralUtility::makeInstance(DeeplCacheManager::class);
-        $this->cache = $this->cacheManager->getCache('deepl_translate_cache');
     }
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
@@ -90,7 +94,7 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
         $typoScriptFrontendController = $request->getAttribute('frontend.controller') ?? $GLOBALS['TSFE'] ?? null;
 
         $config = GeneralUtility::makeInstance(ExtensionConfiguration::class)
-            ->get('deepl_translate');
+            ->get('wr_deepl_translate');
 
         try {
             $currentUri = $request->getUri();

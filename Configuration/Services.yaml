@@ -15,6 +15,11 @@ services:
   Werkraum\DeeplTranslate\Cache\DeeplCacheManager:
     public: true
 
+  Werkraum\DeeplTranslate\Middleware\TranslationMiddleware:
+    public: true
+    arguments:
+      $cache: '@deepl.deepl_translate_cache'
+
   Werkraum\DeeplTranslate\Controller\Backend\AjaxController:
     public: true
 
@@ -24,26 +29,26 @@ services:
   Werkraum\DeeplTranslate\HrefLang\HrefLangGenerator:
     tags:
       - name: 'event.listener'
-        identifier: 'werkraum/deepl-translate/hreflangGenerator'
+        identifier: 'werkraum/deepl-translate-slim/hreflangGenerator'
         event: TYPO3\CMS\Frontend\Event\ModifyHrefLangTagsEvent
 
   Werkraum\DeeplTranslate\Middleware\EventListener\IsAllowedLanguageEventListener:
     tags:
       - name: 'event.listener'
-        before: 'werkraum/deepl-translate/isBot'
-        identifier: 'werkraum/deepl-translate/isAllowedLanguage'
+        before: 'werkraum/deepl-translate-slim/isBot'
+        identifier: 'werkraum/deepl-translate-slim/isAllowedLanguage'
         event: Werkraum\DeeplTranslate\Middleware\Event\IsTranslationAllowedEvent
 
   Werkraum\DeeplTranslate\Middleware\EventListener\IsBotEventListener:
     tags:
       - name: 'event.listener'
-        identifier: 'werkraum/deepl-translate/isBot'
+        identifier: 'werkraum/deepl-translate-slim/isBot'
         event: Werkraum\DeeplTranslate\Middleware\Event\IsTranslationAllowedEvent
 
   Werkraum\DeeplTranslate\Cache\DatabaseSchemaService:
     tags:
       - name: 'event.listener'
-        identifier: 'werkraum/deepl-translate/databaseSchemaService'
+        identifier: 'werkraum/deepl-translate-slim/databaseSchemaService'
         method: 'addCachingFrameworkDatabaseSchema'
         event: TYPO3\CMS\Core\Database\Event\AlterTableDefinitionStatementsEvent
 

@@ -9,7 +9,16 @@
  */
 
 /*
- * This file is part of TYPO3 CMS-based extension "deepl_translate" by werkraum.
+ * This file is part of TYPO3 CMS-based extension "wr_deepl_translate" by werkraum.
+ *
+ *  It is free software; you can redistribute it and/or modify it under
+ *  the terms of the GNU General Public License, either version 2
+ *  of the License, or any later version.
+ *
+ */
+
+/*
+ * This file is part of TYPO3 CMS-based extension "wr_deepl_translate" by werkraum.
  *
  *  It is free software; you can redistribute it and/or modify it under
  *  the terms of the GNU General Public License, either version 2
@@ -46,18 +55,18 @@ class AjaxController
         $parsedBody = $request->getParsedBody();
         $queryParams = $request->getQueryParams();
         $pageUid = (int)($parsedBody['id'] ?? $queryParams['id'] ?? 0);
-        $message = $this->getLanguageService()->sL('LLL:EXT:deepl_translate/Resources/Private/Language/locallang.xlf:clearedPageCache.message.error');
+        $message = $this->getLanguageService()->sL('LLL:EXT:wr_deepl_translate/Resources/Private/Language/locallang.xlf:clearedPageCache.message.error');
         $success = false;
         $permissionClause = $this->getBackendUserAuthentication()->getPagePermsClause(Permission::PAGE_SHOW);
         $pageRow = BackendUtility::readPageAccess($pageUid, $permissionClause);
         if ($pageUid !== 0 && $this->getBackendUserAuthentication()->doesUserHaveAccess($pageRow, Permission::PAGE_SHOW)) {
             $this->cacheManager->flushCachesByTag('deeplPageId_' . $pageUid);
-            $message = $this->getLanguageService()->sL('LLL:EXT:deepl_translate/Resources/Private/Language/locallang.xlf:clearedPageCache.message.success');
+            $message = $this->getLanguageService()->sL('LLL:EXT:wr_deepl_translate/Resources/Private/Language/locallang.xlf:clearedPageCache.message.success');
             $success = true;
         }
         return new JsonResponse([
             'success' => $success,
-            'title' => $this->getLanguageService()->sL('LLL:EXT:deepl_translate/Resources/Private/Language/locallang.xlf:clearedPageCache.title'),
+            'title' => $this->getLanguageService()->sL('LLL:EXT:wr_deepl_translate/Resources/Private/Language/locallang.xlf:clearedPageCache.title'),
             'message' => $message
         ]);
     }

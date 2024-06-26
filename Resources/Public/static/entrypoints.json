@@ -2,11 +2,11 @@
   "entrypoints": {
     "deepl": {
       "js": [
-        "/typo3conf/ext/deepl_translate/Resources/Public/static/deepl.js"
+        "/typo3conf/ext/wr_deepl_translate/Resources/Public/static/deepl.js"
       ]
     }
   },
   "integrity": {
-    "/typo3conf/ext/deepl_translate/Resources/Public/static/deepl.js": "sha384-79amVqikuG+CKT2UOD/y5Y7UaatIvYGesNbJ37Gv5gFQDupmNLIpwZeMwcngptc1"
+    "/typo3conf/ext/wr_deepl_translate/Resources/Public/static/deepl.js": "sha384-79amVqikuG+CKT2UOD/y5Y7UaatIvYGesNbJ37Gv5gFQDupmNLIpwZeMwcngptc1"
   }
 }

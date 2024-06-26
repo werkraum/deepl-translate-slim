@@ -9,7 +9,16 @@
  */
 
 /*
- * This file is part of TYPO3 CMS-based extension "deepl_translate" by werkraum.
+ * This file is part of TYPO3 CMS-based extension "wr_deepl_translate" by werkraum.
+ *
+ *  It is free software; you can redistribute it and/or modify it under
+ *  the terms of the GNU General Public License, either version 2
+ *  of the License, or any later version.
+ *
+ */
+
+/*
+ * This file is part of TYPO3 CMS-based extension "wr_deepl_translate" by werkraum.
  *
  *  It is free software; you can redistribute it and/or modify it under
  *  the terms of the GNU General Public License, either version 2
@@ -31,7 +40,7 @@ class DisplayCond implements SingletonInterface
     public function __construct()
     {
         $authenticationKey = GeneralUtility::makeInstance(ExtensionConfiguration::class)
-        ->get('deepl_translate', 'authenticationKey');
+        ->get('wr_deepl_translate', 'authenticationKey');
         $this->isValid = !empty($authenticationKey);
     }
 

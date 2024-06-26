@@ -1,8 +1,16 @@
 <?php
+/*
+ * This file is part of TYPO3 CMS-based extension "deepl_translate" by werkraum.
+ *
+ *  It is free software; you can redistribute it and/or modify it under
+ *  the terms of the GNU General Public License, either version 2
+ *  of the License, or any later version.
+ *
+ */
 
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addStaticFile(
-    'deepl_translate',
+    'wr_deepl_translate',
     'Configuration/TypoScript',
-    '[deepl_translate] Base'
+    '[wr_deepl_translate] Base'
 );
 
