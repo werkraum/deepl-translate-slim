@@ -2,7 +2,6 @@
     "name": "werkraum/deepl-translate-slim",
     "description": "Translate all your pages on demand, without additional configuration. You do not need to set up more than one language in TYPO3. Enable Translation targets in your site configuration and display a language menu with our Menu Integration and you are ready to go.",
     "type": "typo3-cms-extension",
-	"version": "1.0.0",
 	"homepage": "https://werkraum.net/typo3-deepl-integration",
 	"keywords": [
 		"translation",
