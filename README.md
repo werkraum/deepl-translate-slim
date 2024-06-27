@@ -1,4 +1,24 @@
-# Installation
+# What does it do?
+
+Translate all your pages on demand, without additional configuration. You do not need to set up more than one language in TYPO3. Enable Translation targets in your site configuration and display a language menu with our [Menu Integration](#menu-integration) and you are ready to go.
+
++ Pages are only translated on demand
+  + a middleware processes the response from TYPO3 and has it translated by DeepL
+  + the translation process can be customized to your needs [Custom Translation Processing](#custom-translation-processing)
++ all translation targets are validated
+  + e.g. if you disabled ``DK`` it is not possible to bypass this value
++ search bots are excluded by default (otherwise they could use up you api translation volume)
++ all fetched translations are stored in a separate [cache](#caching) (to further protect you api volume)
+
+## Further Infos
+
+[Demo Link (german)](https://deepl.werkraum.net/)
+
+[first News (german)](https://werkraum.net/news/deepl-uebersetzungen-in-typo3)
+
+[https://werkraum.net/typo3-deepl-integration (german)](https://werkraum.net/typo3-deepl-integration)
+
+## Installation
 
 ``composer require werkraum/deepl-translate-slim``
 
