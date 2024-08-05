@@ -28,9 +28,9 @@
 
 $EM_CONF[$_EXTKEY] = [
     'title' => 'DeepL Translate Slim',
-    'description' => 'Translate TYPO3 pages with DeepL without headaches',
+    'description' => 'Automatic translations of entire TYPO3 websites with DeepL. Quick and easy. Without extra languages in the backend and without headaches.',
     'category' => 'plugin',
-    'version' => '1.0.3',
+    'version' => '1.0.4',
     'author' => 'Lukas Niestroj',
     'author_email' => 'lukas.niestroj@werkraum.net',
     'author_company' => 'werkraum.net',
