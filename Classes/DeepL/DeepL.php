@@ -285,7 +285,7 @@ class DeepL implements LoggerAwareInterface, SingletonInterface
             }
         }
 
-        $body = http_build_query($params, null, '&');
+        $body = http_build_query($params, '', '&');
 
         if (isset($textString)) {
             return $textString . '&' . $body;
