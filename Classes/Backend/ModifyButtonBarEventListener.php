@@ -70,7 +70,7 @@ class ModifyButtonBarEventListener
             $buttons[ButtonBar::BUTTON_POSITION_RIGHT][0][] = $button;
 
             /** @var PageRenderer $pageRenderer */
-            $this->pageRenderer->loadRequireJsModule('TYPO3/CMS/DeeplTranslate/ClearCache');
+            $this->pageRenderer->loadRequireJsModule('TYPO3/CMS/WrDeeplTranslate/ClearCache');
             $event->setButtons($buttons);
         }
 
