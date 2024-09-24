@@ -50,13 +50,16 @@ class HrefLangGenerator
 
         /** @var Site $site */
         $site = $event->getRequest()->getAttribute('site');
-        $displayHreflang = (bool)$site->getConfiguration()['deepl_hreflang'];
+        $displayHreflang = (bool)($site->getConfiguration()['deepl_hreflang'] ?? false);
 
         if (!$displayHreflang) {
             return;
         }
 
-        $targetSourceLanguage = (int)$site->getConfiguration()['default_deepl_source_language'];
+        $targetSourceLanguage = (int)($site->getConfiguration()['default_deepl_source_language'] ?? -1);
+        if ($targetSourceLanguage < 0) {
+            return;
+        }
         $language = $site->getLanguageById($targetSourceLanguage);
 
         $hreflang = $language->getHreflang();
@@ -68,7 +71,7 @@ class HrefLangGenerator
             return;
         }
 
-        $allowedLanguages = (string)$site->getConfiguration()['default_deepl_allowed_languages'];
+        $allowedLanguages = (string)($site->getConfiguration()['default_deepl_allowed_languages'] ?? '');
         foreach (explode(',', $allowedLanguages) as $languageCode) {
             // lowercase is important since it describes the language not the region https://en.wikipedia.org/wiki/ISO_639-1
             $languageCode = strtolower($languageCode);
