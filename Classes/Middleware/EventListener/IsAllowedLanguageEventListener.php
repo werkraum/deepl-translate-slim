@@ -53,7 +53,7 @@ class IsAllowedLanguageEventListener implements LoggerAwareInterface
         $originalLanguage = $request->getAttribute('language', $site->getDefaultLanguage());
         $requestedLanguage = strtoupper(trim((string) ($request->getParsedBody()['deepl'] ?? $request->getQueryParams()['deepl'] ?? null)));
         $disabled = DeeplSiteLanguage::getDeeplDisabled($originalLanguage);
-        $allowedLanguages = DeeplSiteLanguage::getDeeplAllowedLanguages($originalLanguage) ?? (string)$site->getConfiguration()['default_deepl_allowed_languages'];
+        $allowedLanguages = DeeplSiteLanguage::getDeeplAllowedLanguages($originalLanguage) ?? (string)($site->getConfiguration()['default_deepl_allowed_languages'] ?? '');
 
         if (empty($config['authenticationKey'])
             || $disabled
