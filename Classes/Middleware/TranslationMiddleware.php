@@ -9,6 +9,15 @@
  */
 
 /*
+ * This file is part of TYPO3 CMS-based extension "deepl_translate" by werkraum.
+ *
+ *  It is free software; you can redistribute it and/or modify it under
+ *  the terms of the GNU General Public License, either version 2
+ *  of the License, or any later version.
+ *
+ */
+
+/*
  * This file is part of TYPO3 CMS-based extension "wr_deepl_translate" by werkraum.
  *
  *  It is free software; you can redistribute it and/or modify it under
@@ -132,7 +141,7 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
             if (($translation = $this->cache->get($cacheIdentifier)) === false) {
                 $this->deepL = new DeepL();
 
-                $doc = new \DOMDocument();
+                $doc = new \DOMDocument('1.0', 'UTF-8');
                 $doc->preserveWhiteSpace = false;
                 $doc->formatOutput = false;
                 @$doc->loadHTML($contents);
@@ -226,7 +235,7 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
                 $mainTranslation = $mainTranslation[0]['text'];
 
                 // build the translated response
-                $newDoc = new \DOMDocument();
+                $newDoc = new \DOMDocument('1.0', 'UTF-8');
                 @$newDoc->loadHTML(mb_convert_encoding($mainTranslation, 'HTML-ENTITIES', 'UTF-8'));
                 $newBodyElement = $newDoc->documentElement;
 
@@ -258,7 +267,7 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
                 $response = new Response();
             }
 
-            $doc = new \DOMDocument();
+            $doc = new \DOMDocument('1.0', 'UTF-8');
             $doc->preserveWhiteSpace = false;
             $doc->formatOutput = false;
             @$doc->loadHTML($contents);
@@ -280,7 +289,7 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
                 $source->parentNode->removeChild($source);
             }
 
-            $translatedDoc = new \DOMDocument();
+            $translatedDoc = new \DOMDocument('1.0', 'UTF-8');
             @$translatedDoc->loadHTML(mb_convert_encoding((string) $translation, 'HTML-ENTITIES', 'UTF-8'));
 
             $xpath = new \DOMXPath($translatedDoc);
@@ -293,7 +302,7 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
             $headNode = $translatedDoc->getElementsByTagName('head')
                 ->item(0);
             foreach ($styleSheets as $element) {
-                $tempDoc = new \DOMDocument();
+                $tempDoc = new \DOMDocument('1.0', 'UTF-8');
                 @$tempDoc->loadHTML(mb_convert_encoding($element, 'HTML-ENTITIES', 'UTF-8'));
                 $tempElement = $tempDoc->documentElement;
                 $tempNode = $translatedDoc->importNode($tempElement, true);
@@ -302,7 +311,7 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
             $bodyNode = $translatedDoc->getElementsByTagName('body')
                 ->item(0);
             foreach ($scripts as $element) {
-                $tempDoc = new \DOMDocument();
+                $tempDoc = new \DOMDocument('1.0', 'UTF-8');
                 @$tempDoc->loadHTML(mb_convert_encoding($element, 'HTML-ENTITIES', 'UTF-8'));
                 $tempElement = $tempDoc->documentElement;
                 $tempNode = $translatedDoc->importNode($tempElement, true);
