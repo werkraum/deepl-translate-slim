@@ -18,6 +18,15 @@
  */
 
 /*
+ * This file is part of TYPO3 CMS-based extension "deepl_translate" by werkraum.
+ *
+ *  It is free software; you can redistribute it and/or modify it under
+ *  the terms of the GNU General Public License, either version 2
+ *  of the License, or any later version.
+ *
+ */
+
+/*
  * This file is part of TYPO3 CMS-based extension "wr_deepl_translate" by werkraum.
  *
  *  It is free software; you can redistribute it and/or modify it under
@@ -43,6 +52,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 use Werkraum\DeeplTranslate\DeepL\DeepL;
 use Werkraum\DeeplTranslate\DocumentProcessor\DocumentProcessorInterface;
+use Werkraum\DeeplTranslate\StringUtility;
 
 class TranslateByMachineProcessor implements DocumentProcessorInterface
 {
@@ -111,7 +121,7 @@ class TranslateByMachineProcessor implements DocumentProcessorInterface
         $target = $xpath->query("//*[@id='$translatedByMachineTarget']")->item(0);
         if ($target instanceof \DOMElement) {
             $tempDoc = new \DOMDocument('1.0', 'UTF-8');
-            @$tempDoc->loadHTML(mb_convert_encoding($this->text, 'HTML-ENTITIES', 'UTF-8'));
+            @$tempDoc->loadHTML(StringUtility::normalizeUtf8($this->text));
             $tempElement = $tempDoc->documentElement;
             $tempNode = $document->importNode($tempElement, true);
 

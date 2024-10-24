@@ -18,6 +18,15 @@
  */
 
 /*
+ * This file is part of TYPO3 CMS-based extension "deepl_translate" by werkraum.
+ *
+ *  It is free software; you can redistribute it and/or modify it under
+ *  the terms of the GNU General Public License, either version 2
+ *  of the License, or any later version.
+ *
+ */
+
+/*
  * This file is part of TYPO3 CMS-based extension "wr_deepl_translate" by werkraum.
  *
  *  It is free software; you can redistribute it and/or modify it under
@@ -42,6 +51,7 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use TYPO3\CMS\Core\Site\Entity\Site;
 use Werkraum\DeeplTranslate\DocumentProcessor\DocumentProcessorInterface;
+use Werkraum\DeeplTranslate\StringUtility;
 
 class ExcludeByCssProcessor implements DocumentProcessorInterface, LoggerAwareInterface
 {
@@ -93,7 +103,7 @@ class ExcludeByCssProcessor implements DocumentProcessorInterface, LoggerAwareIn
         $xpath = new \DOMXPath($document);
         foreach ($this->excludedElements as $index => $element) {
             $tempDoc = new \DOMDocument('1.0', 'UTF-8');
-            @$tempDoc->loadHTML(mb_convert_encoding((string) $element, 'HTML-ENTITIES', 'UTF-8'));
+            @$tempDoc->loadHTML(StringUtility::normalizeUtf8((string) $element));
             $tempElement = $tempDoc->documentElement;
             $tempNode = $document->importNode($tempElement, true);
 

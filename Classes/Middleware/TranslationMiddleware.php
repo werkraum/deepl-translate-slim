@@ -18,6 +18,15 @@
  */
 
 /*
+ * This file is part of TYPO3 CMS-based extension "deepl_translate" by werkraum.
+ *
+ *  It is free software; you can redistribute it and/or modify it under
+ *  the terms of the GNU General Public License, either version 2
+ *  of the License, or any later version.
+ *
+ */
+
+/*
  * This file is part of TYPO3 CMS-based extension "wr_deepl_translate" by werkraum.
  *
  *  It is free software; you can redistribute it and/or modify it under
@@ -62,6 +71,7 @@ use Werkraum\DeeplTranslate\Middleware\Event\BeforeTranslatingMainContentEvent;
 use Werkraum\DeeplTranslate\Middleware\Event\CacheIdentifierEvent;
 use Werkraum\DeeplTranslate\Middleware\Event\IsTranslationAllowedEvent;
 use Werkraum\DeeplTranslate\Site\Entity\SiteLanguage as DeeplSiteLanguage;
+use Werkraum\DeeplTranslate\StringUtility;
 
 class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
 {
@@ -144,7 +154,7 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
                 $doc = new \DOMDocument('1.0', 'UTF-8');
                 $doc->preserveWhiteSpace = false;
                 $doc->formatOutput = false;
-                @$doc->loadHTML($contents);
+                @$doc->loadHTML(StringUtility::normalizeUtf8($contents));
                 /** @var \DOMElement $bodyContent */
                 $bodyContent = $doc->getElementsByTagName('body')->item(0);
 
@@ -236,7 +246,7 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
 
                 // build the translated response
                 $newDoc = new \DOMDocument('1.0', 'UTF-8');
-                @$newDoc->loadHTML(mb_convert_encoding($mainTranslation, 'HTML-ENTITIES', 'UTF-8'));
+                @$newDoc->loadHTML(StringUtility::normalizeUtf8($mainTranslation));
                 $newBodyElement = $newDoc->documentElement;
 
                 foreach (\array_reverse($this->processorChain->getProcessors()) as $processor) {
@@ -270,7 +280,7 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
             $doc = new \DOMDocument('1.0', 'UTF-8');
             $doc->preserveWhiteSpace = false;
             $doc->formatOutput = false;
-            @$doc->loadHTML($contents);
+            @$doc->loadHTML(StringUtility::normalizeUtf8($contents));
             $xpath = new \DOMXPath($doc);
             $xpathClassQuery = \PhpCss::toXpath('link[rel=stylesheet]');
             $sources = $xpath->query($xpathClassQuery);
@@ -290,7 +300,7 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
             }
 
             $translatedDoc = new \DOMDocument('1.0', 'UTF-8');
-            @$translatedDoc->loadHTML(mb_convert_encoding((string) $translation, 'HTML-ENTITIES', 'UTF-8'));
+            @$translatedDoc->loadHTML(StringUtility::normalizeUtf8((string) $translation));
 
             $xpath = new \DOMXPath($translatedDoc);
             $xpathClassQuery = \PhpCss::toXpath('link[rel=stylesheet],script[src]');
@@ -303,7 +313,7 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
                 ->item(0);
             foreach ($styleSheets as $element) {
                 $tempDoc = new \DOMDocument('1.0', 'UTF-8');
-                @$tempDoc->loadHTML(mb_convert_encoding($element, 'HTML-ENTITIES', 'UTF-8'));
+                @$tempDoc->loadHTML(StringUtility::normalizeUtf8($element));
                 $tempElement = $tempDoc->documentElement;
                 $tempNode = $translatedDoc->importNode($tempElement, true);
                 $headNode->appendChild($tempNode->childNodes->item(0)->childNodes->item(0));
@@ -312,7 +322,7 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
                 ->item(0);
             foreach ($scripts as $element) {
                 $tempDoc = new \DOMDocument('1.0', 'UTF-8');
-                @$tempDoc->loadHTML(mb_convert_encoding($element, 'HTML-ENTITIES', 'UTF-8'));
+                @$tempDoc->loadHTML(StringUtility::normalizeUtf8($element));
                 $tempElement = $tempDoc->documentElement;
                 $tempNode = $translatedDoc->importNode($tempElement, true);
                 $bodyNode->appendChild($tempNode->childNodes->item(0)->childNodes->item(0));
@@ -349,4 +359,5 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
 
         return $response;
     }
+
 }
