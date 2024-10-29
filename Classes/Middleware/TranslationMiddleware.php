@@ -63,7 +63,6 @@ use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
-use Werkraum\DeeplTranslate\Cache\DeeplCacheManager;
 use Werkraum\DeeplTranslate\DeepL\DeepL;
 use Werkraum\DeeplTranslate\DocumentProcessor\DocumentProcessorChain;
 use Werkraum\DeeplTranslate\Middleware\Event\BeforeSettingTranslationIntoCacheEvent;
@@ -155,22 +154,13 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
                 $doc->preserveWhiteSpace = false;
                 $doc->formatOutput = false;
                 @$doc->loadHTML(StringUtility::normalizeUtf8($contents));
-                /** @var \DOMElement $bodyContent */
-                $bodyContent = $doc->getElementsByTagName('body')->item(0);
-
-                if (!$bodyContent->ownerDocument instanceof \DOMDocument) {
-                    $this->logger->critical('empty body', ['currentUri' => $currentUri]);
-                    return $response;
-                }
 
                 foreach ($this->processorChain->getProcessors() as $processor) {
                     $processor->extractFromDocument($doc);
                 }
 
-                $bodyContent->ownerDocument->preserveWhiteSpace = false;
-                $bodyContent->ownerDocument->formatOutput = false;
-                $bodyContent->ownerDocument->normalizeDocument();
-                $mainContent = $bodyContent->ownerDocument->saveHTML($bodyContent);
+                $mainContent = $doc->saveHTML();
+                unset($doc);
                 // remove whitespace between tags... libxml is not very helpful since it's very depending on the installed version
                 $mainContent = preg_replace('/>\s+</', '><', $mainContent);
                 // replace non-closing <br> with self-closing one <br/>
@@ -247,16 +237,13 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
                 // build the translated response
                 $newDoc = new \DOMDocument('1.0', 'UTF-8');
                 @$newDoc->loadHTML(StringUtility::normalizeUtf8($mainTranslation));
-                $newBodyElement = $newDoc->documentElement;
 
                 foreach (\array_reverse($this->processorChain->getProcessors()) as $processor) {
                     $processor->embedInDocument($newDoc);
                 }
 
-                $importedBody = $doc->importNode($newBodyElement, true);
-                $bodyContent->parentNode->replaceChild($importedBody, $bodyContent);
-                $translation = $doc->saveHTML();
-
+                $translation = $newDoc->saveHTML();
+                unset($newDoc);
                 // put result into cache
                 $tags = [
                     "deeplPageId_{$pageArguments->getPageId()}", // flush by page id
@@ -277,10 +264,13 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
                 $response = new Response();
             }
 
+            // extract stylesheets and scripts from original response and embed into translation to ensure
+            // they are valid, e.g. after cache invalidation through TYPO3 backend
             $doc = new \DOMDocument('1.0', 'UTF-8');
             $doc->preserveWhiteSpace = false;
             $doc->formatOutput = false;
             @$doc->loadHTML(StringUtility::normalizeUtf8($contents));
+
             $xpath = new \DOMXPath($doc);
             $xpathClassQuery = \PhpCss::toXpath('link[rel=stylesheet]');
             $sources = $xpath->query($xpathClassQuery);
@@ -290,6 +280,7 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
                 $styleSheets []= $source->ownerDocument->saveHTML($source);
                 $source->parentNode->removeChild($source);
             }
+
             $xpathClassQuery = \PhpCss::toXpath('script[src]');
             $sources = $xpath->query($xpathClassQuery);
             $scripts = [];
@@ -309,6 +300,7 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
                 // delete any css/js file
                 $source->parentNode->removeChild($source);
             }
+            // append stylesheets to head
             $headNode = $translatedDoc->getElementsByTagName('head')
                 ->item(0);
             foreach ($styleSheets as $element) {
@@ -318,6 +310,7 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
                 $tempNode = $translatedDoc->importNode($tempElement, true);
                 $headNode->appendChild($tempNode->childNodes->item(0)->childNodes->item(0));
             }
+            // append scripts to body
             $bodyNode = $translatedDoc->getElementsByTagName('body')
                 ->item(0);
             foreach ($scripts as $element) {
