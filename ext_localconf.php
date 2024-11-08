@@ -28,7 +28,7 @@ $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['proc
 
 $GLOBALS['TYPO3_CONF_VARS']['FE']['cacheHash']['excludedParameters'] []= 'deepl';
 
-$GLOBALS['TYPO3_CONF_VARS']['LOG']['Werkraum']['writerConfiguration'] = [
+$GLOBALS['TYPO3_CONF_VARS']['LOG']['Werkraum']['DeeplTranslate']['writerConfiguration'] = [
     \TYPO3\CMS\Core\Log\LogLevel::DEBUG => [
         \TYPO3\CMS\Core\Log\Writer\FileWriter::class => [
             'logFileInfix' => 'deepl'
