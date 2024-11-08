@@ -41,8 +41,16 @@ class UsageStatus implements StatusProviderInterface
                 \TYPO3\CMS\Core\Type\ContextualFeedbackSeverity::ERROR
             );
         } else {
-            $deepL = new DeepL($authenticationKey);
-            $usage = $deepL->usage();
+            try {
+                $deepL = new DeepL($authenticationKey);
+                $usage = $deepL->usage();
+            } catch (\Exception) {
+                $usage = [
+                    'character_count' => 'API error',
+                    'character_limit' => 'API error'
+                ];
+            }
+
 
             $reports['character_count'] = GeneralUtility::makeInstance(
                 Status::class,
