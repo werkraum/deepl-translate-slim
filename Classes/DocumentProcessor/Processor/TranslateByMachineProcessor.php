@@ -10,6 +10,8 @@
 
 namespace Werkraum\DeeplTranslate\DocumentProcessor\Processor;
 
+use Psr\Http\Message\ServerRequestInterface;
+use TYPO3\CMS\Core\Http\ServerRequestFactory;
 use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -24,11 +26,12 @@ class TranslateByMachineProcessor implements DocumentProcessorInterface
 
     public function extractFromDocument(\DOMDocument $document): void
     {
+        $request = $this->getRequest();
         /** @var Site $site */
-        $site = $GLOBALS['TYPO3_REQUEST']->getAttribute('site', null);
+        $site = $request->getAttribute('site', null);
         /** @var SiteLanguage $originalLanguage */
-        $originalLanguage = $GLOBALS['TYPO3_REQUEST']->getAttribute('language', $site->getDefaultLanguage());
-        $requestedLanguage = strtoupper(trim((string) ($GLOBALS['TYPO3_REQUEST']->getParsedBody()['deepl'] ?? $GLOBALS['TYPO3_REQUEST']->getQueryParams()['deepl'] ?? null)));
+        $originalLanguage = $request->getAttribute('language', $site->getDefaultLanguage());
+        $requestedLanguage = strtoupper(trim((string) ($request->getParsedBody()['deepl'] ?? $request->getQueryParams()['deepl'] ?? null)));
         $targetSourceLanguage = \Werkraum\DeeplTranslate\Site\Entity\SiteLanguage::getDeeplSourceLanguage($originalLanguage) ?? (int)$site->getConfiguration()['default_deepl_source_language'];
 
         if ($originalLanguage->getLanguageId() !== $targetSourceLanguage) {
@@ -38,7 +41,7 @@ class TranslateByMachineProcessor implements DocumentProcessorInterface
         }
 
         $deepL = new DeepL();
-        $currentUri = $GLOBALS['TYPO3_REQUEST']->getUri();
+        $currentUri = $request->getUri();
 
         $translatedByMachineText = (string)$site->getConfiguration()['deepl_translated_by_machine'];
         $translatedByMachineText = \str_replace('originalLink', 'originalLink -> f:format.raw()', $translatedByMachineText);
@@ -58,8 +61,9 @@ class TranslateByMachineProcessor implements DocumentProcessorInterface
 
     public function getTextsForTranslation(): array
     {
+        $request = $this->getRequest();
         /** @var Site $site */
-        $site = $GLOBALS['TYPO3_REQUEST']->getAttribute('site', null);
+        $site = $request->getAttribute('site', null);
         $translateTranslatedByMachineText = (bool)$site->getConfiguration()['deepl_translate_translated_by_machine'];
         if ($translateTranslatedByMachineText) {
             return [$this->text];
@@ -77,8 +81,9 @@ class TranslateByMachineProcessor implements DocumentProcessorInterface
 
     public function embedInDocument(\DOMDocument $document): void
     {
+        $request = $this->getRequest();
         /** @var Site $site */
-        $site = $GLOBALS['TYPO3_REQUEST']->getAttribute('site', null);
+        $site = $request->getAttribute('site', null);
         $translatedByMachineTarget = (string)$site->getConfiguration()['deepl_translated_by_machine_target'];
 
         $xpath = new \DOMXPath($document);
@@ -102,4 +107,10 @@ class TranslateByMachineProcessor implements DocumentProcessorInterface
     {
         return 10;
     }
+
+    protected function getRequest(): ServerRequestInterface
+    {
+        return $GLOBALS['TYPO3_REQUEST'] ?? ServerRequestFactory::fromGlobals();
+    }
+
 }

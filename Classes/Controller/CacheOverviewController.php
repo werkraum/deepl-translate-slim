@@ -57,9 +57,6 @@ class CacheOverviewController extends TranslationStatusController
                 'pageUid' => $this->id,
                 'depthDropdownOptions' => $allowedModuleOptions['depth'],
                 'depthDropdownCurrentValue' => $this->currentDepth,
-//                'displayLangDropdown' => !empty($allowedModuleOptions['lang']),
-//                'langDropdownOptions' => $allowedModuleOptions['lang'],
-//                'langDropdownCurrentValue' => $this->currentLanguageId,
                 'content' => $content,
             ]);
         }
@@ -169,11 +166,10 @@ class CacheOverviewController extends TranslationStatusController
                                 ->from($backend->getCacheTable())
                                 ->where(
                                     $queryBuilder->expr()
-                                        ->eq('identifier', $queryBuilder->createNamedParameter($identifier, \PDO::PARAM_STR)),
+                                        ->eq('identifier', $queryBuilder->createNamedParameter($identifier)),
                                     $queryBuilder->expr()
                                         ->gte('expires', $queryBuilder->createNamedParameter(
-                                            GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('date', 'timestamp'),
-                                            \PDO::PARAM_INT
+                                            GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('date', 'timestamp')
                                         )
                                 ))
                                 ->executeQuery()

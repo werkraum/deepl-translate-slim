@@ -10,14 +10,16 @@
 
 namespace Werkraum\DeeplTranslate\Backend;
 
+use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Template\Components\ButtonBar;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
+use TYPO3\CMS\Core\Http\ServerRequestFactory;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
+use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Page\PageRenderer;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class ModifyButtonBarEventListener
 {
@@ -37,7 +39,8 @@ class ModifyButtonBarEventListener
         $buttons = $event->getButtons();
         $buttonBar = $event->getButtonBar();
 
-        $pageId = (int)($GLOBALS['TYPO3_REQUEST']->getParsedBody()['id'] ?? $GLOBALS['TYPO3_REQUEST']->getQueryParams()['id'] ?? null);
+        $request = $this->getRequest();
+        $pageId = (int)($request->getParsedBody()['id'] ?? $request->getQueryParams()['id'] ?? null);
 
         $isAdmin = $this->backendUser->isAdmin();
         $userTsConfig = $this->backendUser->getTSConfig();
@@ -51,8 +54,12 @@ class ModifyButtonBarEventListener
             $button->setTitle($this->getLanguageService()->sL('LLL:EXT:wr_deepl_translate/Resources/Private/Language/locallang.xlf:clearPageCacheTitle'));
             $buttons[ButtonBar::BUTTON_POSITION_RIGHT][0][] = $button;
 
-            /** @var PageRenderer $pageRenderer */
-            $this->pageRenderer->loadRequireJsModule('TYPO3/CMS/WrDeeplTranslate/ClearCache');
+            if ((new Typo3Version)->getMajorVersion() < 13) {
+                /** @var PageRenderer $pageRenderer */
+                $this->pageRenderer->loadRequireJsModule('TYPO3/CMS/WrDeeplTranslate/ClearCache');
+            } else {
+                $this->pageRenderer->loadJavaScriptModule('@deepl/ClearCache.mjs');
+            }
             $event->setButtons($buttons);
         }
 
@@ -61,6 +68,11 @@ class ModifyButtonBarEventListener
     protected function getLanguageService(): LanguageService
     {
         return $GLOBALS['LANG'];
+    }
+
+    protected function getRequest(): ServerRequestInterface
+    {
+        return $GLOBALS['TYPO3_REQUEST'] ?? ServerRequestFactory::fromGlobals();
     }
 
 }

@@ -12,6 +12,7 @@ namespace Werkraum\DeeplTranslate\Backend\Form\Element;
 
 use TYPO3\CMS\Backend\Form\Element\AbstractFormElement;
 use TYPO3\CMS\Backend\Form\NodeFactory;
+use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\StringUtility;
 use Werkraum\DeeplTranslate\ExtendedVersionHelper;
@@ -24,7 +25,9 @@ class ExtendedVersionElement extends AbstractFormElement
 
     public function __construct(NodeFactory $nodeFactory = null, array $data = [])
     {
-        parent::__construct($nodeFactory, $data);
+        if ((new Typo3Version)->getMajorVersion() < 13) {
+            parent::__construct($nodeFactory, $data);
+        }
         $this->extendedVersionHelper = GeneralUtility::makeInstance(ExtendedVersionHelper::class);
     }
 

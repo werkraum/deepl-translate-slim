@@ -12,6 +12,7 @@ namespace Werkraum\DeeplTranslate;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Configuration\SiteTcaConfiguration;
 use TYPO3\CMS\Backend\Routing\Route;
+use TYPO3\CMS\Core\Http\ServerRequestFactory;
 
 /**
  * Only to manage the unavailable TCA column type 'user' on save
@@ -23,11 +24,8 @@ class ExtendedSiteTcaConfiguration extends SiteTcaConfiguration
     {
         $tca = parent::getTca();
 
-        /** @var ServerRequestInterface $request */
-        $request = $GLOBALS['TYPO3_REQUEST'];
-
         /** @var Route $routing */
-        if ($route = $request->getAttribute('route')) {
+        if ($route = $this->getRequest()->getAttribute('route')) {
             if ( $route->getPath() === '/module/site/configuration/save' ) {
                 $tca['site']['columns']['deepl_split_content_by_selectors']['config']['type'] = 'text';
                 $tca['site']['columns']['deepl_recaptcha']['config']['type'] = 'text';
@@ -36,5 +34,10 @@ class ExtendedSiteTcaConfiguration extends SiteTcaConfiguration
         }
 
         return $tca;
+    }
+
+    protected function getRequest(): ServerRequestInterface
+    {
+        return $GLOBALS['TYPO3_REQUEST'] ?? ServerRequestFactory::fromGlobals();
     }
 }

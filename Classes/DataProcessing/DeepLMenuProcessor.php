@@ -14,6 +14,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Http\ServerRequestFactory;
+use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Site\Entity\NullSite;
 use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\Entity\SiteInterface;
@@ -29,7 +30,7 @@ use Werkraum\DeeplTranslate\DeepL\LanguageMapping;
 
 class DeepLMenuProcessor implements DataProcessorInterface
 {
-    public function process(ContentObjectRenderer $cObj, array $contentObjectConfiguration, array $processorConfiguration, array $processedData)
+    public function process(ContentObjectRenderer $cObj, array $contentObjectConfiguration, array $processorConfiguration, array $processedData): array
     {
         $authenticationKey = GeneralUtility::makeInstance(ExtensionConfiguration::class)
             ->get('wr_deepl_translate', 'authenticationKey');
@@ -83,16 +84,21 @@ class DeepLMenuProcessor implements DataProcessorInterface
         return $processedData;
     }
 
-    protected function getLink(string $language, int $sourceLanguage)
+    protected function getLink(string $language, int $sourceLanguage): string
     {
         // Temporarily remove current mountpoint information as we want to have the
         // URL of the target page and not of the page within the mountpoint if the
         // current page is a mountpoint.
-        $previousMp = $this->getTypoScriptFrontendController()->MP;
-        $this->getTypoScriptFrontendController()->MP = '';
+        if ((new Typo3Version())->getMajorVersion() < 13) {
+            $previousMp = $this->getTypoScriptFrontendController()->MP;
+            $this->getTypoScriptFrontendController()->MP = '';
+        } else {
+            $previousMp = $this->getRequest()->getAttribute('frontend.page.information')->getMountPoint();
+            $this->getRequest()->getAttribute('frontend.page.information')->setMountPoint('');
+        }
 
         $link = $this->getTypoScriptFrontendController()->cObj->typoLink_URL([
-            'parameter' => $this->getTypoScriptFrontendController()->id . ',' . $this->getTypoScriptFrontendController()->getPageArguments()->getPageType(),
+            'parameter' => $this->getCurrentPageId() . ',' . $this->getPageType(),
             'forceAbsoluteUrl' => true,
             'addQueryString' => true,
             'addQueryString.' => [
@@ -100,7 +106,7 @@ class DeepLMenuProcessor implements DataProcessorInterface
                 'exclude' => implode(
                     ',',
                     CanonicalizationUtility::getParamsToExcludeForCanonicalizedUrl(
-                        $this->getTypoScriptFrontendController()->id,
+                        $this->getCurrentPageId(),
                         (array)$GLOBALS['TYPO3_CONF_VARS']['FE']['additionalCanonicalizedUrlParameters']
                     )
                 )
@@ -108,7 +114,11 @@ class DeepLMenuProcessor implements DataProcessorInterface
             'language' => $sourceLanguage,
             'additionalParams' => '&deepl=' . $language
         ]);
-        $this->getTypoScriptFrontendController()->MP = $previousMp;
+        if ((new Typo3Version())->getMajorVersion() < 13) {
+            $this->getTypoScriptFrontendController()->MP = $previousMp;
+        } else {
+            $this->getRequest()->getAttribute('frontend.page.information')->setMountPoint($previousMp);
+        }
         return $link;
     }
 
@@ -119,7 +129,7 @@ class DeepLMenuProcessor implements DataProcessorInterface
     {
         try {
             return GeneralUtility::makeInstance(SiteFinder::class)
-                ->getSiteByPageId($this->getTypoScriptFrontendController()->id);
+                ->getSiteByPageId($this->getCurrentPageId());
         } catch (SiteNotFoundException) {
             return new NullSite();
         }
@@ -128,18 +138,39 @@ class DeepLMenuProcessor implements DataProcessorInterface
     /**
      * @return TypoScriptFrontendController
      */
-    protected function getTypoScriptFrontendController()
+    protected function getTypoScriptFrontendController(): TypoScriptFrontendController
     {
         return $GLOBALS['TSFE'];
     }
 
+    protected function getRequest(): ServerRequestInterface
+    {
+        return $GLOBALS['TYPO3_REQUEST'] ?? ServerRequestFactory::fromGlobals();
+    }
+
     private function getCurrentLanguage(): SiteLanguage
     {
-        /** @var ServerRequestInterface $request */
-        $request = $GLOBALS['TYPO3_REQUEST'] ?? ServerRequestFactory::fromGlobals();
+        $request = $this->getRequest();
         if ($request->getAttribute('originalLanguage') instanceof SiteLanguage) {
             return $request->getAttribute('originalLanguage');
         }
         return $request->getAttribute('language');
     }
+
+    private function getPageType(): string
+    {
+        if ((new Typo3Version())->getMajorVersion() < 13) {
+            return $this->getTypoScriptFrontendController()->getPageArguments()->getPageType();
+        }
+        return $this->getRequest()->getAttribute('routing')->getPageType();
+    }
+
+    private function getCurrentPageId(): int
+    {
+        if ((new Typo3Version())->getMajorVersion() < 13) {
+            return $this->getTypoScriptFrontendController()->id;
+        }
+        return $this->getRequest()->getAttribute('frontend.page.information')->getId();
+    }
+
 }

@@ -24,9 +24,6 @@ class AjaxController
 {
     private DeeplCacheManager $cacheManager;
 
-    /**
-     * @param DeeplCacheManager $cacheManager
-     */
     public function __construct()
     {
         $this->cacheManager = GeneralUtility::makeInstance(DeeplCacheManager::class);

@@ -302,18 +302,10 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
             $response = $handler->handle($request);
         }
 
-        // we need to reapply the content length header since it might be different!
-        // remove with TYPO3 11 since its methods are deprecated
-        if ($GLOBALS['TSFE'] instanceof TypoScriptFrontendController) {
-            $context = $GLOBALS['TSFE']->getContext();
-            if (
-                (!isset($GLOBALS['TSFE']->config['config']['enableContentLengthHeader']) || $GLOBALS['TSFE']->config['config']['enableContentLengthHeader'])
-                && !$context->getPropertyFromAspect('backend.user', 'isLoggedIn', false) && !$context->getPropertyFromAspect('workspace', 'isOffline', false)
-            ) {
-                $response = $response->withHeader('Content-Length', (string)$response->getBody()->getSize());
-            }
-        }
-
+//        if ($response->hasHeader('Content-Length')) {
+//            // we need to reapply the content length header since it might be different!
+//            $response = $response->withHeader('Content-Length', (string)$response->getBody()->getSize());
+//        }
         return $response;
     }
 

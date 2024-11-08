@@ -32,7 +32,7 @@ final class DatabaseSchemaService
      *
      * @return string Cache framework SQL
      */
-    private function getCachingFrameworkRequiredDatabaseSchema()
+    private function getCachingFrameworkRequiredDatabaseSchema(): string
     {
         // Use new to circumvent the singleton pattern of CacheManager
         $cacheManager = new CacheManager();

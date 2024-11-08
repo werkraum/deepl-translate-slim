@@ -30,8 +30,7 @@ class DeeplConditionFunctionsProvider implements ExpressionFunctionProviderInter
         return new ExpressionFunction('deeplSourceLanguage', function (): void {
 //            empty by design
         }, function ($arguments, $str) {
-            /** @var ServerRequestInterface $request */
-            $request = $GLOBALS['TYPO3_REQUEST'] ?? ServerRequestFactory::fromGlobals();
+            $request = $this->getRequest();
             if ($request->getAttribute('originalLanguage') instanceof SiteLanguage) {
                 $siteLanguage =  $request->getAttribute('originalLanguage');
                 $methodName = 'get' . ucfirst(trim($str));
@@ -41,5 +40,10 @@ class DeeplConditionFunctionsProvider implements ExpressionFunctionProviderInter
             }
             return -1;
         });
+    }
+
+    protected function getRequest(): ServerRequestInterface
+    {
+        return $GLOBALS['TYPO3_REQUEST'] ?? ServerRequestFactory::fromGlobals();
     }
 }

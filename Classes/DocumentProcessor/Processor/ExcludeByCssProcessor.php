@@ -11,8 +11,10 @@
 namespace Werkraum\DeeplTranslate\DocumentProcessor\Processor;
 
 use PhpCss\Exception\ParserException;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use TYPO3\CMS\Core\Http\ServerRequestFactory;
 use TYPO3\CMS\Core\Site\Entity\Site;
 use Werkraum\DeeplTranslate\DocumentProcessor\DocumentProcessorInterface;
 use Werkraum\DeeplTranslate\StringUtility;
@@ -26,7 +28,7 @@ class ExcludeByCssProcessor implements DocumentProcessorInterface, LoggerAwareIn
     public function extractFromDocument(\DOMDocument $document): void
     {
         /** @var Site $site */
-        $site = $GLOBALS['TYPO3_REQUEST']->getAttribute('site', null);
+        $site = $this->getRequest()->getAttribute('site', null);
         $excludeByCssSelector = (string)$site->getConfiguration()['deepl_exclude_elements_by_selector'];
         if ($excludeByCssSelector !== '') {
             $xpath = new \DOMXPath($document);
@@ -86,5 +88,10 @@ class ExcludeByCssProcessor implements DocumentProcessorInterface, LoggerAwareIn
     public static function getPriority(): int
     {
         return 100;
+    }
+
+    protected function getRequest(): ServerRequestInterface
+    {
+        return $GLOBALS['TYPO3_REQUEST'] ?? ServerRequestFactory::fromGlobals();
     }
 }

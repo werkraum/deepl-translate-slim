@@ -10,7 +10,9 @@
 
 namespace Werkraum\DeeplTranslate\HrefLang;
 
+use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Core\Http\Uri;
+use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
@@ -26,7 +28,7 @@ class HrefLangGenerator
     public function __invoke(ModifyHrefLangTagsEvent $event): void
     {
         $hrefLangs = $event->getHrefLangs();
-        if ((int)$this->getTypoScriptFrontendController()->page['no_index'] === 1) {
+        if ((int)$this->getPageRecord($event->getRequest())['no_index'] === 1) {
             return;
         }
 
@@ -66,9 +68,12 @@ class HrefLangGenerator
         $event->setHrefLangs($hrefLangs);
     }
 
-    protected function getTypoScriptFrontendController(): TypoScriptFrontendController
+    protected function getPageRecord(ServerRequestInterface $request): array
     {
-        return $GLOBALS['TSFE'];
+        if ((new Typo3Version()) < 13) {
+            return $GLOBALS['TSFE']->page;
+        }
+        return $request->getAttribute('frontend.page.information')->getPageRecord();
     }
 
     public function setContentObjectRenderer(ContentObjectRenderer $cObj): void

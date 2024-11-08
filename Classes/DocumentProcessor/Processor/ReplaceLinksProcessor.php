@@ -10,6 +10,8 @@
 
 namespace Werkraum\DeeplTranslate\DocumentProcessor\Processor;
 
+use Psr\Http\Message\ServerRequestInterface;
+use TYPO3\CMS\Core\Http\ServerRequestFactory;
 use Werkraum\DeeplTranslate\DocumentProcessor\DocumentProcessorInterface;
 use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -36,9 +38,10 @@ class ReplaceLinksProcessor implements DocumentProcessorInterface
 
     public function embedInDocument(\DOMDocument $document): void
     {
+        $request = $this->getRequest();
         /** @var Site $site */
-        $site = $GLOBALS['TYPO3_REQUEST']->getAttribute('site', null);
-        $requestedLanguage = strtoupper(trim((string) ($GLOBALS['TYPO3_REQUEST']->getParsedBody()['deepl'] ?? $GLOBALS['TYPO3_REQUEST']->getQueryParams()['deepl'] ?? null)));
+        $site = $request->getAttribute('site', null);
+        $requestedLanguage = strtoupper(trim((string) ($request->getParsedBody()['deepl'] ?? $request->getQueryParams()['deepl'] ?? null)));
 
         $replaceLinks = (bool)$site->getConfiguration()['deepl_replace_links'];
         if ($replaceLinks) {
@@ -92,5 +95,10 @@ class ReplaceLinksProcessor implements DocumentProcessorInterface
     public static function getPriority(): int
     {
         return 100;
+    }
+
+    protected function getRequest(): ServerRequestInterface
+    {
+        return $GLOBALS['TYPO3_REQUEST'] ?? ServerRequestFactory::fromGlobals();
     }
 }
