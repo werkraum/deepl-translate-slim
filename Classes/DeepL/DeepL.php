@@ -10,12 +10,14 @@
 
 namespace Werkraum\DeeplTranslate\DeepL;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use Werkraum\DeeplTranslate\Middleware\Event\UpdateDeeplTranslationParamsEvent;
 
 class DeepL implements LoggerAwareInterface, SingletonInterface
 {
@@ -60,6 +62,8 @@ class DeepL implements LoggerAwareInterface, SingletonInterface
 
     protected bool $debug;
 
+    private EventDispatcherInterface $eventDispatcher;
+
     /**
      * DeepL constructor
      */
@@ -72,6 +76,7 @@ class DeepL implements LoggerAwareInterface, SingletonInterface
         $this->curl = curl_init();
 
         $this->logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(self::class);
+        $this->eventDispatcher = GeneralUtility::makeInstance(EventDispatcherInterface::class);
 
         $this->debug = getenv('DEEPL_DUMMY_REQUESTS') && (bool)getenv('DEEPL_DUMMY_REQUESTS');
     }
@@ -168,7 +173,8 @@ class DeepL implements LoggerAwareInterface, SingletonInterface
             'glossary_id' => $glossaryId,
         ];
 
-        $params = $this->removeEmptyParams($params);
+        $event = $this->eventDispatcher->dispatch(new UpdateDeeplTranslationParamsEvent($params));
+        $params = $this->removeEmptyParams($event->getParams());
         $url = $this->buildBaseUrl();
         $body = $this->buildQuery($params);
 
