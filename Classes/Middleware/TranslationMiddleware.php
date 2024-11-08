@@ -302,10 +302,6 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
             $response = $handler->handle($request);
         }
 
-//        if ($response->hasHeader('Content-Length')) {
-//            // we need to reapply the content length header since it might be different!
-//            $response = $response->withHeader('Content-Length', (string)$response->getBody()->getSize());
-//        }
         return $response;
     }
 
