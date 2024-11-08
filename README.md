@@ -79,7 +79,7 @@ dataProcessing {
 >
 <nav class="nav languagenav text-uppercase notranslate">
     <f:for each="{menu}" as="item" iteration="iter">
-        <a class="nav-link" href="{item.link}" hreflang="{item.hreflang}" title="{item.title}">
+        <a class="nav-link" href="{item.link}" hreflang="{item.hreflang}" rel="alternate nofollow" title="{item.title}">
             <span>{item.title}</span>
         </a>
     </f:for>
@@ -104,3 +104,18 @@ A dedicated view in the InfoModule provides a detailed overview of all cached pa
 You can customize and extend the translation process by implementing a custom DocumentProcessor with the Interface ``\Werkraum\DeeplTranslate\DocumentProcessor\DocumentProcessorInterface``.
 
 Look into [ReplaceLinksProcessor.php](Classes/DocumentProcessor/Processor/ReplaceLinksProcessor.php) to see it in action.
+
+## SEO and Bots
+
+To save DeepL resources and avoid spamming the translation service, we use the following rules:
+
+- search bots are excluded by default (otherwise they could use up your api translation volume)
+- all fetched translations are stored in a separate cache (to further protect your api volume)
+
+You should exclude all Urls with ``deepl`` from your robots.txt file. For example:
+
+```
+User-agent: *
+Disallow: /*?deepl=/
+Disallow: /*&deepl=/
+```
