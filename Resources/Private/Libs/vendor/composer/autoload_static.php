@@ -6,35 +6,35 @@ namespace Composer\Autoload;
 
 class ComposerStaticInitddfa340051d848ac079a62eaaabf5d8a
 {
-    public static $files = [
+    public static $files = array (
         'd7c9a5138b45deb428e175ae748db2c5' => __DIR__ . '/..' . '/carica/phpcss/src/PhpCss.php',
-    ];
+    );
 
-    public static $prefixLengthsPsr4 = [
-        'P' =>
-        [
+    public static $prefixLengthsPsr4 = array (
+        'P' => 
+        array (
             'PhpCss\\' => 7,
-        ],
-        'J' =>
-        [
+        ),
+        'J' => 
+        array (
             'Jaybizzle\\CrawlerDetect\\' => 24,
-        ],
-    ];
+        ),
+    );
 
-    public static $prefixDirsPsr4 = [
-        'PhpCss\\' =>
-        [
+    public static $prefixDirsPsr4 = array (
+        'PhpCss\\' => 
+        array (
             0 => __DIR__ . '/..' . '/carica/phpcss/src/PhpCss',
-        ],
-        'Jaybizzle\\CrawlerDetect\\' =>
-        [
+        ),
+        'Jaybizzle\\CrawlerDetect\\' => 
+        array (
             0 => __DIR__ . '/..' . '/jaybizzle/crawler-detect/src',
-        ],
-    ];
+        ),
+    );
 
-    public static $classMap = [
+    public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
-    ];
+    );
 
     public static function getInitializer(ClassLoader $loader)
     {
@@ -42,6 +42,7 @@ class ComposerStaticInitddfa340051d848ac079a62eaaabf5d8a
             $loader->prefixLengthsPsr4 = ComposerStaticInitddfa340051d848ac079a62eaaabf5d8a::$prefixLengthsPsr4;
             $loader->prefixDirsPsr4 = ComposerStaticInitddfa340051d848ac079a62eaaabf5d8a::$prefixDirsPsr4;
             $loader->classMap = ComposerStaticInitddfa340051d848ac079a62eaaabf5d8a::$classMap;
+
         }, null, ClassLoader::class);
     }
 }

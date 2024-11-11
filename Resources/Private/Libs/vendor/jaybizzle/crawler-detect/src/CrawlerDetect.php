@@ -29,14 +29,14 @@ class CrawlerDetect
      *
      * @var array
      */
-    protected $httpHeaders = [];
+    protected $httpHeaders = array();
 
     /**
      * Store regex matches.
      *
      * @var array
      */
-    protected $matches = [];
+    protected $matches = array();
 
     /**
      * Crawlers object.
@@ -98,7 +98,7 @@ class CrawlerDetect
      */
     public function compileRegex($patterns)
     {
-        return '(' . implode('|', $patterns) . ')';
+        return '('.implode('|', $patterns).')';
     }
 
     /**
@@ -114,7 +114,7 @@ class CrawlerDetect
         }
 
         // Clear existing headers.
-        $this->httpHeaders = [];
+        $this->httpHeaders = array();
 
         // Only save HTTP headers. In PHP land, that means
         // only _SERVER vars that start with HTTP_.
@@ -145,7 +145,7 @@ class CrawlerDetect
         if (is_null($userAgent)) {
             foreach ($this->getUaHttpHeaders() as $altHeader) {
                 if (isset($this->httpHeaders[$altHeader])) {
-                    $userAgent .= $this->httpHeaders[$altHeader] . ' ';
+                    $userAgent .= $this->httpHeaders[$altHeader].' ';
                 }
             }
         }
@@ -165,14 +165,16 @@ class CrawlerDetect
         $agent = trim(preg_replace(
             "/{$this->compiledExclusions}/i",
             '',
-            $userAgent ?: $this->userAgent
+            $userAgent ?: $this->userAgent ?: ''
         ));
 
         if ($agent === '') {
+            $this->matches = array();
+
             return false;
         }
 
-        return (bool)preg_match("/{$this->compiledRegex}/i", $agent, $this->matches);
+        return (bool) preg_match("/{$this->compiledRegex}/i", $agent, $this->matches);
     }
 
     /**
@@ -185,6 +187,7 @@ class CrawlerDetect
         return isset($this->matches[0]) ? $this->matches[0] : null;
     }
 
+
     /**
      * @return string|null
      */
@@ -192,5 +195,4 @@ class CrawlerDetect
     {
         return $this->userAgent;
     }
-
 }

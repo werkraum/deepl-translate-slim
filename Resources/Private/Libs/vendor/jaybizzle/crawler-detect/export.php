@@ -14,15 +14,15 @@ require 'src/Fixtures/Crawlers.php';
 require 'src/Fixtures/Exclusions.php';
 require 'src/Fixtures/Headers.php';
 
-$src = [
+$src = array(
     'Crawlers',
     'Exclusions',
     'Headers',
-];
+);
 
 foreach ($src as $class) {
     $class = "Jaybizzle\\CrawlerDetect\\Fixtures\\$class";
-    $object = new $class();
+    $object = new $class;
 
     outputJson($object);
     outputTxt($object);

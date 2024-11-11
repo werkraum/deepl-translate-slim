@@ -5,7 +5,7 @@
 $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
-return [
-    'PhpCss\\' => [$vendorDir . '/carica/phpcss/src/PhpCss'],
-    'Jaybizzle\\CrawlerDetect\\' => [$vendorDir . '/jaybizzle/crawler-detect/src'],
-];
+return array(
+    'PhpCss\\' => array($vendorDir . '/carica/phpcss/src/PhpCss'),
+    'Jaybizzle\\CrawlerDetect\\' => array($vendorDir . '/jaybizzle/crawler-detect/src'),
+);
