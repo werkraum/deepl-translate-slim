@@ -313,7 +313,7 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
                 }
             }
         } else {
-            $typoScriptConfigArray = $request->getAttribute('frontend.typoscript')->getConfigArray();
+            $typoScriptConfigArray = $request->getAttribute('frontend.typoscript')?->getConfigArray();
             if (
                 (!isset($typoScriptConfigArray['enableContentLengthHeader']) || $typoScriptConfigArray['enableContentLengthHeader'])
                 && !$this->context->getPropertyFromAspect('backend.user', 'isLoggedIn', false)
