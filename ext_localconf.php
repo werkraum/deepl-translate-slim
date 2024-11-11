@@ -8,7 +8,9 @@
  *
  */
 
-require \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('wr_deepl_translate') . '/Resources/Private/Libs/vendor/autoload.php';
+if (!\TYPO3\CMS\Core\Core\Environment::isComposerMode()) {
+    require \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('wr_deepl_translate') . '/Resources/Private/Libs/vendor/autoload.php';
+}
 
 //if (!is_array($GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['wr_deepl_translate']['caching']['cacheConfigurations']['deepl_translate_cache'])) {
     $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['wr_deepl_translate']['caching']['cacheConfigurations']['deepl_translate_cache'] = [
