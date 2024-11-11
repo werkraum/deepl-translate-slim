@@ -22,6 +22,7 @@ use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Http\Response;
 use TYPO3\CMS\Core\Http\Stream;
+use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Routing\PageArguments;
 use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
@@ -46,13 +47,13 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
         protected EventDispatcherInterface $eventDispatcher,
         protected DocumentProcessorChain $processorChain,
         protected FrontendInterface $cache,
+        private Context $context,
     ) {
     }
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $backendUserLoggedIn = GeneralUtility::makeInstance(Context::class)
-            ->getPropertyFromAspect('backend.user', 'isLoggedIn', false);
+        $backendUserLoggedIn = $this->context->getPropertyFromAspect('backend.user', 'isLoggedIn', false);
         // do not translate anything if a backenduser is logged in to prevent admin_panel overlay in translation result or anything similar!
         if ($backendUserLoggedIn) {
             return $handler->handle($request);
@@ -302,15 +303,26 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
             $response = $handler->handle($request);
         }
 
-        if ($GLOBALS['TSFE'] instanceof TypoScriptFrontendController) {
-            $context = $GLOBALS['TSFE']->getContext();
+        if ((new Typo3Version())->getMajorVersion() < 13) {
+            if ($GLOBALS['TSFE'] instanceof TypoScriptFrontendController) {
+                if (
+                    (!isset($GLOBALS['TSFE']->config['config']['enableContentLengthHeader']) || $GLOBALS['TSFE']->config['config']['enableContentLengthHeader'])
+                    && !$this->context->getPropertyFromAspect('backend.user', 'isLoggedIn', false) && !$this->context->getPropertyFromAspect('workspace', 'isOffline', false)
+                ) {
+                    $response = $response->withHeader('Content-Length', (string)$response->getBody()->getSize());
+                }
+            }
+        } else {
+            $typoScriptConfigArray = $request->getAttribute('frontend.typoscript')->getConfigArray();
             if (
-                (!isset($GLOBALS['TSFE']->config['config']['enableContentLengthHeader']) || $GLOBALS['TSFE']->config['config']['enableContentLengthHeader'])
-                && !$context->getPropertyFromAspect('backend.user', 'isLoggedIn', false) && !$context->getPropertyFromAspect('workspace', 'isOffline', false)
+                (!isset($typoScriptConfigArray['enableContentLengthHeader']) || $typoScriptConfigArray['enableContentLengthHeader'])
+                && !$this->context->getPropertyFromAspect('backend.user', 'isLoggedIn', false)
+                && !$this->context->getPropertyFromAspect('workspace', 'isOffline', false)
             ) {
                 $response = $response->withHeader('Content-Length', (string)$response->getBody()->getSize());
             }
         }
+
 
         return $response;
     }
