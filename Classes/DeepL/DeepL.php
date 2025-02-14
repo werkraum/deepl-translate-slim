@@ -17,6 +17,7 @@ use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use Werkraum\DeeplTranslate\Cache\DeeplCacheManager;
 use Werkraum\DeeplTranslate\Middleware\Event\UpdateDeeplTranslationParamsEvent;
 
 class DeepL implements LoggerAwareInterface, SingletonInterface
@@ -55,8 +56,6 @@ class DeepL implements LoggerAwareInterface, SingletonInterface
      * Maximum number of seconds the query should take
      */
     protected ?int $timeout = null;
-
-    protected $internalCache = [];
 
     protected bool $debug;
 
@@ -336,12 +335,23 @@ class DeepL implements LoggerAwareInterface, SingletonInterface
      */
     public function languages(string $type = 'source'): array
     {
-        if (isset($this->internalCache['language_' . $type])) {
-            return $this->internalCache['language_' . $type];
+        $cacheManager = GeneralUtility::makeInstance(DeeplCacheManager::class);
+        $cache = $cacheManager->getCache("deepl_translate_cache");
+
+        if ($languages = $cache->get("deepl_languages_$type")) {
+            return $languages;
         }
+
         $url = $this->buildBaseUrl('languages');
         $body = $this->buildQuery(['type' => $type]);
-        return $this->request($url, $body, 'GET');
+        try {
+            $languages = $this->request($url, $body, 'GET');
+            $cache->set("deepl_languages_$type", $languages);
+        } catch (DeepLException $e) {
+            $languages = [];
+        }
+
+        return $languages;
     }
 
     /**
@@ -350,9 +360,6 @@ class DeepL implements LoggerAwareInterface, SingletonInterface
      */
     public function usage(): array
     {
-        if (isset($this->internalCache['usage'])) {
-            return $this->internalCache['usage'];
-        }
         $url = $this->buildBaseUrl('usage');
         return $this->request($url, '', 'GET');
     }
