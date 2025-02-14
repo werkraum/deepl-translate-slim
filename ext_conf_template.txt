@@ -3,6 +3,9 @@ authenticationKey=
 # cat=DeepL; type=options[Pro=api.deepl.com,Free=api-free.deepl.com]; label=API Type
 host=api-free.deepl.com
 
+# cat=Advanced; type=options[XML=xml,Html=html]; label=tag_handling
+tag_handling=xml
+
 # cat=Advanced; type=string; label=ignore_tags (comma-separated!)
 ignoreTags=script,style,img,audio,video
 # cat=DeepL; type=options[Default=default,More=more,Less=less]; label=formality
