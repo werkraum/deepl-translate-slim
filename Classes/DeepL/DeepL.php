@@ -29,8 +29,6 @@ class DeepL implements LoggerAwareInterface, SingletonInterface
      */
     public const API_URL_BASE = '%s://%s/v%s/%s';
 
-    protected bool $authKeyInHeader = false;
-
     /**
      * DeepL API Version (v2 is default since 2018)
      */
@@ -118,19 +116,6 @@ class DeepL implements LoggerAwareInterface, SingletonInterface
     public function setTimeout(int $timeout): void
     {
         $this->timeout = $timeout;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isAuthKeyInHeader()
-    {
-        return $this->authKeyInHeader;
-    }
-
-    public function setAuthKeyInHeader(bool $authKeyInHeader): void
-    {
-        $this->authKeyInHeader = $authKeyInHeader;
     }
 
     /**
@@ -241,19 +226,13 @@ class DeepL implements LoggerAwareInterface, SingletonInterface
 
     protected function buildBaseUrl(string $resource = 'translate'): string
     {
-        $base = sprintf(
+        return sprintf(
             self::API_URL_BASE,
             'https',
             $this->host,
             $this->apiVersion,
             $resource
         );
-
-        if (!$this->authKeyInHeader) {
-            return $base . '?auth_key=' . $this->authKey;
-        }
-
-        return $base;
     }
 
     protected function buildQuery(array $params): string
@@ -295,9 +274,7 @@ class DeepL implements LoggerAwareInterface, SingletonInterface
         curl_setopt($this->curl, CURLOPT_URL, $url);
         curl_setopt($this->curl, CURLOPT_POSTFIELDS, $body);
 
-        if ($this->authKeyInHeader) {
-            $headers []= 'Authorization: DeepL-Auth-Key ' . $this->authKey;
-        }
+        $headers []= 'Authorization: DeepL-Auth-Key ' . $this->authKey;
 
         switch ($method) {
             case 'GET':
@@ -396,7 +373,7 @@ class DeepL implements LoggerAwareInterface, SingletonInterface
      * @return array{language: string, name: string, supports_formality: bool}|null
      * @throws DeepLException
      */
-    public function languageData(string $target)
+    public function languageData(string $target): ?array
     {
         $languages = $this->languages('target');
 
