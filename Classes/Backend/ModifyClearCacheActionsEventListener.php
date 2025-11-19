@@ -30,7 +30,7 @@ class ModifyClearCacheActionsEventListener
         $isAdmin = $this->backendUser->isAdmin();
         $userTsConfig = $this->backendUser->getTSConfig();
 
-        if ($isAdmin || $userTsConfig['options.']['clearCache.']['deepl'] ?? false) {
+        if ($isAdmin || ($userTsConfig['options.']['clearCache.']['deepl'] ?? false)) {
             $cacheAction = [
                 'id' => 'clearDeeplTranslationCache',
                 'title' => 'LLL:EXT:wr_deepl_translate/Resources/Private/Language/locallang.xlf:clearAllCacheTitle',
