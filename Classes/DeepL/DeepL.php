@@ -197,7 +197,8 @@ class DeepL implements LoggerAwareInterface, SingletonInterface
         // request the DeepL API
         $translationsArray = $this->request($url, $body);
 
-        return $translationsArray['translations'];
+        // return an empty array if no translations were made
+        return $translationsArray['translations'] ?? [];
     }
 
     private function removeEmptyParams(array $params): array
