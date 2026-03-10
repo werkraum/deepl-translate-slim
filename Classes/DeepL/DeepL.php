@@ -24,6 +24,24 @@ class DeepL implements LoggerAwareInterface, SingletonInterface
 {
     use LoggerAwareTrait;
 
+    public const RTL_LANGUAGES = [
+        "AR", // arabic
+        "ARC", // aramaic
+        "AZ", // azerbaijani
+        "DV", // divehi
+        "FA", // persian
+        "HA", // hausa
+        "HE", // hebrew
+        "KHW", // khowar
+        "KS", // kashiri
+        "KU", // kurdish
+        "PA", // punjabi
+        "PS", // pashto
+        "UR", // urdu
+        "YO", // yoruba
+        "YI" // yiddish
+    ];
+
     /**
      * API BASE URL
      * https://api.deepl.com/v2/[resource]?auth_key=12345

@@ -292,6 +292,13 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
                 $bodyNode->appendChild($tempNode->childNodes->item(0)->childNodes->item(0));
             }
 
+            $isRtl = array_key_exists($requestedLanguage, array_flip(DeepL::RTL_LANGUAGES));
+            if ($isRtl) {
+                $translatedDoc->documentElement->setAttribute('dir', 'rtl');
+            } else {
+                $translatedDoc->documentElement->setAttribute('dir', 'ltr');
+            }
+
             $body = new Stream('php://temp', 'rw');
             $body->write($translatedDoc->saveHTML());
             $response = $response->withBody($body);
