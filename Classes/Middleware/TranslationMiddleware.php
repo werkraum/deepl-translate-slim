@@ -298,6 +298,7 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
             } else {
                 $translatedDoc->documentElement->setAttribute('dir', 'ltr');
             }
+            $translatedDoc->documentElement->setAttribute('lang', $requestedLanguage);
 
             $body = new Stream('php://temp', 'rw');
             $body->write($translatedDoc->saveHTML());
