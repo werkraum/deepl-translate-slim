@@ -349,7 +349,7 @@ class DeepL implements LoggerAwareInterface, SingletonInterface
         $body = $this->buildQuery(['type' => $type]);
         try {
             $languages = $this->request($url, $body, 'GET');
-            $cache->set("deepl_languages_$type", $languages);
+            $cache->set("deepl_languages_$type", $languages, ['deepl_translations'], 86400 * 7); // a week
         } catch (DeepLException $e) {
             $languages = [];
         }
