@@ -5,6 +5,8 @@ host=api-free.deepl.com
 
 # cat=Advanced; type=options[XML=xml,Html=html]; label=tag_handling
 tag_handling=xml
+# cat=Advanced; type=options[v1=v1,v2=v2]; label=tag_tag_handling_version
+tag_handling_version=v1
 
 # cat=Advanced; type=string; label=ignore_tags (comma-separated!)
 ignoreTags=script,style,img,audio,video

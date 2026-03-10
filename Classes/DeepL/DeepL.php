@@ -140,7 +140,8 @@ class DeepL implements LoggerAwareInterface, SingletonInterface
         string $nonSplittingTags = '',
         int $outlineDetection = 1,
         string $splittingTags = '',
-        string $glossaryId = ''
+        string $glossaryId = '',
+        string $tagHandlingVersion = 'v1'
     ): array {
         $params = [
             'text' => $text,
@@ -155,6 +156,7 @@ class DeepL implements LoggerAwareInterface, SingletonInterface
             'preserve_formatting' => $preserveFormatting,
             'outline_detection' => $outlineDetection,
             'glossary_id' => $glossaryId,
+            'tag_handling_version' => $tagHandlingVersion,
         ];
 
         $event = $this->eventDispatcher->dispatch(new UpdateDeeplTranslationParamsEvent($params));

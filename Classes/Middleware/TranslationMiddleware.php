@@ -155,6 +155,8 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
                                 $config['nonSplittingTags'],
                                 $config['outlineDetection'],
                                 $config['splittingTags'],
+                                '',
+                                $config['tag_handling_version'] ?? 'v1',
                             );
                             $translations []= $translation[0]['text'];
                             unset($translation);
@@ -172,6 +174,8 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
                             $config['nonSplittingTags'],
                             $config['outlineDetection'],
                             $config['splittingTags'],
+                            '',
+                            $config['tag_handling_version'] ?? 'v1',
                         );
 
                         $translations = \array_map(static fn($i) => $i['text'], $translations);
@@ -196,6 +200,8 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
                     $config['nonSplittingTags'],
                     $config['outlineDetection'],
                     $config['splittingTags'],
+                    '',
+                    $config['tag_handling_version'] ?? 'v1',
                 );
                 $mainTranslation = $mainTranslation[0]['text'];
 
