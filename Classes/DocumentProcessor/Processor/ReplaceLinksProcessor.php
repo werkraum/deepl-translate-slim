@@ -50,7 +50,7 @@ class ReplaceLinksProcessor implements DocumentProcessorInterface
 
             $baseHost = $site->getBase()->getHost();
 
-            if ($baseHost === '') {
+            if (empty($baseHost)) {
                 $baseHost = $site->getBase()->getPath();
             }
 
@@ -65,31 +65,61 @@ class ReplaceLinksProcessor implements DocumentProcessorInterface
                     }
 
                     $href = $link->getAttribute('href');
-                    if (!str_starts_with($href, '/')) {
+                    if (strpos($href, '/') !== 0) {
                         $host = \parse_url($href, \PHP_URL_HOST);
-                        if ($host === '') {
-                            continue;
-                        }
-                        if ($host === false) {
-                            continue;
-                        }
-                        if ($host === null) {
+                        if (empty($host)) {
                             continue;
                         }
                         if ($host !== $baseHost) {
                             continue;
                         }
                     }
+                    $deeplParam = "deepl=$requestedLanguage";
+                    $link->setAttribute('href', $this->extendLink($href, $deeplParam));
+                }
+            }
+            // add deepl param to all forms
+            $links = $xpath->query('//form[@action]');
+            foreach ($links as $link) {
+                if ($link instanceof \DOMElement) {
+                    foreach ($attributesToIgnore as $item) {
+                        if ($link->hasAttribute($item)) {
+                            continue 2;
+                        }
+                    }
 
-                    $query = \parse_url($href, \PHP_URL_QUERY);
-
-                    $href .= $query ? '&' : '?';
-                    $href .= "deepl=$requestedLanguage";
-
-                    $link->setAttribute('href', $href);
+                    $href = $link->getAttribute('action');
+                    if (strpos($href, '/') !== 0) {
+                        $host = \parse_url($href, \PHP_URL_HOST);
+                        if (empty($host)) {
+                            continue;
+                        }
+                        if ($host !== $baseHost) {
+                            continue;
+                        }
+                    }
+                    $deeplParam = "deepl=$requestedLanguage";
+                    $link->setAttribute('action', $this->extendLink($href, $deeplParam));
                 }
             }
         }
+    }
+
+    private function extendLink(string $link, string $deeplParam): string
+    {
+        $parsed_url = \parse_url($link);
+        $scheme   = isset($parsed_url['scheme']) ? $parsed_url['scheme'] . '://' : '';
+        $host     = $parsed_url['host'] ?? '';
+        $port     = isset($parsed_url['port']) ? ':' . $parsed_url['port'] : '';
+        $user     = $parsed_url['user'] ?? '';
+        $pass     = isset($parsed_url['pass']) ? ':' . $parsed_url['pass']  : '';
+        $pass     = ($user || $pass) ? "$pass@" : '';
+        $path     = $parsed_url['path'] ?? '';
+        $query    = isset($parsed_url['query'])
+            ? '?' . $parsed_url['query'] . '&' . $deeplParam
+            : '?' . $deeplParam;
+        $fragment = isset($parsed_url['fragment']) ? '#' . $parsed_url['fragment'] : '';
+        return $scheme . $user . $pass . $host . $port . $path . $query . $fragment;
     }
 
     public static function getPriority(): int
