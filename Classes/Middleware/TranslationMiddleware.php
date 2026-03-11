@@ -31,6 +31,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 use Werkraum\DeeplTranslate\DeepL\DeepL;
 use Werkraum\DeeplTranslate\DocumentProcessor\DocumentProcessorChain;
+use Werkraum\DeeplTranslate\Dom\DomDocumentService;
 use Werkraum\DeeplTranslate\Middleware\Event\BeforeSettingTranslationIntoCacheEvent;
 use Werkraum\DeeplTranslate\Middleware\Event\BeforeTranslatingMainContentEvent;
 use Werkraum\DeeplTranslate\Middleware\Event\CacheIdentifierEvent;
@@ -49,6 +50,7 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
         protected DocumentProcessorChain $processorChain,
         protected FrontendInterface $cache,
         private Context $context,
+        protected DomDocumentService $domDocumentService,
     ) {
     }
 
@@ -110,10 +112,7 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
             if (($translation = $this->cache->get($cacheIdentifier)) === false) {
                 $this->deepL = new DeepL();
 
-                $domDocument = new \DOMDocument('1.0', 'UTF-8');
-                $domDocument->preserveWhiteSpace = false;
-                $domDocument->formatOutput = false;
-                @$domDocument->loadHTML(StringUtility::normalizeUtf8($contents));
+                $domDocument = $this->domDocumentService->fromStringContent($contents);
 
                 foreach ($this->processorChain->getProcessors() as $processor) {
                     $processor->extractFromDocument($domDocument);
@@ -201,8 +200,7 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
                 $mainTranslation = $mainTranslation[0]['text'];
 
                 // build the translated response
-                $translatedDocument = new \DOMDocument('1.0', 'UTF-8');
-                @$translatedDocument->loadHTML(StringUtility::normalizeUtf8($mainTranslation));
+                $translatedDocument = $this->domDocumentService->fromStringContent($mainTranslation);
 
                 foreach (\array_reverse($this->processorChain->getProcessors()) as $processor) {
                     $processor->embedInDocument($translatedDocument);
@@ -232,10 +230,7 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
 
             // extract stylesheets and scripts from original response and embed into translation to ensure
             // they are valid, e.g. after cache invalidation through TYPO3 backend
-            $domDocument = new \DOMDocument('1.0', 'UTF-8');
-            $domDocument->preserveWhiteSpace = false;
-            $domDocument->formatOutput = false;
-            @$domDocument->loadHTML(StringUtility::normalizeUtf8($contents));
+            $domDocument = $this->domDocumentService->fromStringContent($contents);
 
             $xpath = new \DOMXPath($domDocument);
             $xpathClassQuery = \PhpCss::toXpath('link[rel=stylesheet]');
@@ -256,8 +251,7 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
                 $source->parentNode->removeChild($source);
             }
 
-            $translatedDoc = new \DOMDocument('1.0', 'UTF-8');
-            @$translatedDoc->loadHTML(StringUtility::normalizeUtf8((string)$translation));
+            $translatedDoc = $this->domDocumentService->fromStringContent($translation);
 
             $xpath = new \DOMXPath($translatedDoc);
             $xpathClassQuery = \PhpCss::toXpath('link[rel=stylesheet],script[src]');
@@ -270,8 +264,7 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
             $headNode = $translatedDoc->getElementsByTagName('head')
                 ->item(0);
             foreach ($styleSheets as $element) {
-                $tempDoc = new \DOMDocument('1.0', 'UTF-8');
-                @$tempDoc->loadHTML(StringUtility::normalizeUtf8($element));
+                $tempDoc = $this->domDocumentService->fromStringContent($element);
                 $tempElement = $tempDoc->documentElement;
                 $tempNode = $translatedDoc->importNode($tempElement, true);
                 $headNode->appendChild($tempNode->childNodes->item(0)->childNodes->item(0));
@@ -280,8 +273,7 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
             $bodyNode = $translatedDoc->getElementsByTagName('body')
                 ->item(0);
             foreach ($scripts as $element) {
-                $tempDoc = new \DOMDocument('1.0', 'UTF-8');
-                @$tempDoc->loadHTML(StringUtility::normalizeUtf8($element));
+                $tempDoc = $this->domDocumentService->fromStringContent($element);
                 $tempElement = $tempDoc->documentElement;
                 $tempNode = $translatedDoc->importNode($tempElement, true);
                 $bodyNode->appendChild($tempNode->childNodes->item(0)->childNodes->item(0));

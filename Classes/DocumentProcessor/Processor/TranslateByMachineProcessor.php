@@ -18,11 +18,17 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 use Werkraum\DeeplTranslate\DeepL\DeepL;
 use Werkraum\DeeplTranslate\DocumentProcessor\DocumentProcessorInterface;
+use Werkraum\DeeplTranslate\Dom\DomDocumentService;
 use Werkraum\DeeplTranslate\StringUtility;
 
 class TranslateByMachineProcessor implements DocumentProcessorInterface
 {
     private string $text;
+
+    public function __construct(
+        private DomDocumentService $domDocumentService
+    ) {
+    }
 
     public function extractFromDocument(\DOMDocument $document): void
     {
@@ -89,8 +95,7 @@ class TranslateByMachineProcessor implements DocumentProcessorInterface
         $xpath = new \DOMXPath($document);
         $target = $xpath->query("//*[@id='$translatedByMachineTarget']")->item(0);
         if ($target instanceof \DOMElement) {
-            $tempDoc = new \DOMDocument('1.0', 'UTF-8');
-            @$tempDoc->loadHTML(StringUtility::normalizeUtf8($this->text));
+            $tempDoc = $this->domDocumentService->fromStringContent($this->text);
             $tempElement = $tempDoc->documentElement;
             $tempNode = $document->importNode($tempElement, true);
 

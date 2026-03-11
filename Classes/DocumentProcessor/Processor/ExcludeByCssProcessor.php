@@ -17,6 +17,7 @@ use Psr\Log\LoggerAwareTrait;
 use TYPO3\CMS\Core\Http\ServerRequestFactory;
 use TYPO3\CMS\Core\Site\Entity\Site;
 use Werkraum\DeeplTranslate\DocumentProcessor\DocumentProcessorInterface;
+use Werkraum\DeeplTranslate\Dom\DomDocumentService;
 use Werkraum\DeeplTranslate\StringUtility;
 
 class ExcludeByCssProcessor implements DocumentProcessorInterface, LoggerAwareInterface
@@ -24,6 +25,11 @@ class ExcludeByCssProcessor implements DocumentProcessorInterface, LoggerAwareIn
     use LoggerAwareTrait;
 
     private array $excludedElements = [];
+
+    public function __construct(
+        private DomDocumentService $domDocumentService
+    ) {
+    }
 
     public function extractFromDocument(\DOMDocument $document): void
     {
@@ -68,8 +74,7 @@ class ExcludeByCssProcessor implements DocumentProcessorInterface, LoggerAwareIn
     {
         $xpath = new \DOMXPath($document);
         foreach ($this->excludedElements as $index => $element) {
-            $tempDoc = new \DOMDocument('1.0', 'UTF-8');
-            @$tempDoc->loadHTML(StringUtility::normalizeUtf8((string) $element));
+            $tempDoc = $this->domDocumentService->fromStringContent($element);
             $tempElement = $tempDoc->documentElement;
             $tempNode = $document->importNode($tempElement, true);
 
