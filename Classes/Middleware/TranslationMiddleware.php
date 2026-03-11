@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of TYPO3 CMS-based extension "deepl_translate" by werkraum.
  *
@@ -71,61 +72,55 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
         $pageArguments = $request->getAttribute('routing', null);
         /** @var SiteLanguage $originalLanguage */
         $originalLanguage = $request->getAttribute('language', $site->getDefaultLanguage());
-        $requestedLanguage = strtoupper(trim((string) ($request->getParsedBody()['deepl'] ?? $request->getQueryParams()['deepl'] ?? null)));
+        $requestedLanguage = strtoupper(trim((string)($request->getParsedBody()['deepl'] ?? $request->getQueryParams()['deepl'] ?? null)));
         $targetSourceLanguage = DeeplSiteLanguage::getDeeplSourceLanguage($originalLanguage) ?? (int)$site->getConfiguration()['default_deepl_source_language'];
-
-        $typoScriptFrontendController = $request->getAttribute('frontend.controller') ?? $GLOBALS['TSFE'] ?? null;
 
         $config = GeneralUtility::makeInstance(ExtensionConfiguration::class)
             ->get('wr_deepl_translate');
 
         try {
-            $currentUri = $request->getUri();
-            // check cache
-            if ($typoScriptFrontendController instanceof TypoScriptFrontendController) {
-                $cacheIdentifier = $typoScriptFrontendController->newHash;
-            } else {
-                // sanitize url
-                $uri = clone $request->getUri();
-                $uri = $uri->withQuery('')
-                    ->withFragment('');
-                $cacheIdentifier = md5((string)$uri);
-            }
-            $cacheIdentifier = md5($cacheIdentifier . $requestedLanguage . $targetSourceLanguage);
-
-            /** @var CacheIdentifierEvent $event */
-            $event = $this->eventDispatcher->dispatch(new CacheIdentifierEvent($request, $cacheIdentifier));
-            $cacheIdentifier = $event->getCacheIdentifier();
-
-            // render the site with specified language if not disabled
+            // render the site with a specified language if not disabled
             if ($originalLanguage->getLanguageId() !== $targetSourceLanguage) {
                 $language = $site->getLanguageById($targetSourceLanguage);
-                $request = $request->withAttribute('originalLanguage', $originalLanguage);
-                $request = $request->withAttribute('language', $language);
+                $subRequest = $request
+                    ->withAttribute('originalLanguage', $originalLanguage)
+                    ->withAttribute('language', $language)
+                ;
             } else {
                 $language = $originalLanguage;
+                $subRequest = clone $request;
             }
-            $response = $handler->handle($request);
+            $response = $handler->handle($subRequest);
 
             // prepare the content for deepl
             $body = $response->getBody();
             $body->rewind();
             $contents = $response->getBody()->getContents();
 
+            $cacheIdentifier = md5((string)(clone $subRequest->getUri())
+                ->withQuery('')
+                ->withFragment(''));
+
+            $cacheIdentifier = md5($cacheIdentifier . $requestedLanguage . $targetSourceLanguage);
+
+            /** @var CacheIdentifierEvent $event */
+            $event = $this->eventDispatcher->dispatch(new CacheIdentifierEvent($subRequest, $cacheIdentifier));
+            $cacheIdentifier = $event->getCacheIdentifier();
+
             if (($translation = $this->cache->get($cacheIdentifier)) === false) {
                 $this->deepL = new DeepL();
 
-                $doc = new \DOMDocument('1.0', 'UTF-8');
-                $doc->preserveWhiteSpace = false;
-                $doc->formatOutput = false;
-                @$doc->loadHTML(StringUtility::normalizeUtf8($contents));
+                $domDocument = new \DOMDocument('1.0', 'UTF-8');
+                $domDocument->preserveWhiteSpace = false;
+                $domDocument->formatOutput = false;
+                @$domDocument->loadHTML(StringUtility::normalizeUtf8($contents));
 
                 foreach ($this->processorChain->getProcessors() as $processor) {
-                    $processor->extractFromDocument($doc);
+                    $processor->extractFromDocument($domDocument);
                 }
 
-                $mainContent = $doc->saveHTML();
-                unset($doc);
+                $mainContent = $domDocument->saveHTML();
+                unset($domDocument);
                 // remove whitespace between tags... libxml is not very helpful since it's very depending on the installed version
                 $mainContent = preg_replace('/>\s+</', '><', $mainContent);
                 // replace non-closing <br> with self-closing one <br/>
@@ -178,7 +173,7 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
                             $config['tag_handling_version'] ?? 'v1',
                         );
 
-                        $translations = \array_map(static fn($i) => $i['text'], $translations);
+                        $translations = \array_map(static fn ($i) => $i['text'], $translations);
                     }
                     $processor->setTranslations($translations);
                     unset($translations);
@@ -206,20 +201,20 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
                 $mainTranslation = $mainTranslation[0]['text'];
 
                 // build the translated response
-                $newDoc = new \DOMDocument('1.0', 'UTF-8');
-                @$newDoc->loadHTML(StringUtility::normalizeUtf8($mainTranslation));
+                $translatedDocument = new \DOMDocument('1.0', 'UTF-8');
+                @$translatedDocument->loadHTML(StringUtility::normalizeUtf8($mainTranslation));
 
                 foreach (\array_reverse($this->processorChain->getProcessors()) as $processor) {
-                    $processor->embedInDocument($newDoc);
+                    $processor->embedInDocument($translatedDocument);
                 }
 
-                $translation = $newDoc->saveHTML();
-                unset($newDoc);
+                $translation = $translatedDocument->saveHTML();
+                unset($translatedDocument);
                 // put result into cache
                 $tags = [
                     "deeplPageId_{$pageArguments->getPageId()}", // flush by page id
                     "deeplPage_{$pageArguments->getPageId()}_{$requestedLanguage}", // used for cache overview
-                    'deepl_translations' // flush all
+                    'deepl_translations', // flush all
                 ];
 
                 /** @var BeforeSettingTranslationIntoCacheEvent $event */
@@ -237,12 +232,12 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
 
             // extract stylesheets and scripts from original response and embed into translation to ensure
             // they are valid, e.g. after cache invalidation through TYPO3 backend
-            $doc = new \DOMDocument('1.0', 'UTF-8');
-            $doc->preserveWhiteSpace = false;
-            $doc->formatOutput = false;
-            @$doc->loadHTML(StringUtility::normalizeUtf8($contents));
+            $domDocument = new \DOMDocument('1.0', 'UTF-8');
+            $domDocument->preserveWhiteSpace = false;
+            $domDocument->formatOutput = false;
+            @$domDocument->loadHTML(StringUtility::normalizeUtf8($contents));
 
-            $xpath = new \DOMXPath($doc);
+            $xpath = new \DOMXPath($domDocument);
             $xpathClassQuery = \PhpCss::toXpath('link[rel=stylesheet]');
             $sources = $xpath->query($xpathClassQuery);
             $styleSheets = [];
@@ -262,7 +257,7 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
             }
 
             $translatedDoc = new \DOMDocument('1.0', 'UTF-8');
-            @$translatedDoc->loadHTML(StringUtility::normalizeUtf8((string) $translation));
+            @$translatedDoc->loadHTML(StringUtility::normalizeUtf8((string)$translation));
 
             $xpath = new \DOMXPath($translatedDoc);
             $xpathClassQuery = \PhpCss::toXpath('link[rel=stylesheet],script[src]');
@@ -306,13 +301,14 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
         } catch (\Exception $exception) {
             if ($response instanceof ResponseInterface) {
                 $this->logger->critical($exception->getMessage(), [
-                    'content-length' => (string)$response->getBody()->getSize()
+                    'content-length' => (string)$response->getBody()->getSize(),
                 ]);
             } else {
                 $this->logger->critical($exception->getMessage());
             }
         }
 
+        // if no translation was found or created, just return the original response
         if (!$response instanceof ResponseInterface) {
             $response = $handler->handle($request);
         }
@@ -337,8 +333,6 @@ class TranslationMiddleware implements MiddlewareInterface, LoggerAwareInterface
             }
         }
 
-
         return $response;
     }
-
 }
