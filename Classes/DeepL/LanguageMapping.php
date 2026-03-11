@@ -15,7 +15,7 @@ class LanguageMapping
     {
         $flagMap = [
             // English & Portuguese Variants
-            'EN-GB'   => 'gb-eng',
+            'EN-GB'   => 'gb',
             'EN-US'   => 'us',     // 'us' is the standard TYPO3 core flag for US English
             'PT-BR'   => 'br',
             'PT-PT'   => 'pt',
